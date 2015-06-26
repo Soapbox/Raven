@@ -100,9 +100,8 @@ class Soapbox
     # Install All The Configured Nginx Sites
     settings["sites"].each do |site|
       config.vm.provision "shell" do |s|
-            s.path = scriptDir + "/serve.sh"
-            s.args = [site["map"], site["to"], site["port"] ||= "80", site["ssl"] ||= "443"]
-          end
+        s.path = scriptDir + "/serve.sh"
+        s.args = [site["map"], site["to"], site["port"] ||= "80", site["ssl"] ||= "443"]
       end
     end
 
@@ -125,7 +124,7 @@ class Soapbox
         end
 
         config.vm.provision "shell" do |s|
-            s.inline = "echo \"\n#Set Soapbox environment variable\nexport $1=$2\" >> /home/vagrant/.profile"
+            s.inline = "echo \"\n#Set Homestead environment variable\nexport $1=$2\" >> /home/vagrant/.profile"
             s.args = [var["key"], var["value"]]
         end
       end
