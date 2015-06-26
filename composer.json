@@ -1,0 +1,23 @@
+{
+    "name": "soapbox/soapbox-vagrant",
+    "description": "A virtual machine for SoapBoxers.",
+    "require": {
+        "php": ">=5.4",
+        "symfony/console": "~2.0",
+        "symfony/process": "~2.0"
+    },
+    "authors": [
+        {
+            "name": "Jaspaul Bola",
+            "email": "jaspaul@soapboxhq.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SoapBox\\SoapboxVagrant\\": "src/"
+        }
+    },
+    "bin": [
+        "homestead"
+    ]
+}
