@@ -11,7 +11,7 @@ class Soapbox
 
     # Configure The Box
     config.vm.box = "soapbox/soapbox-vagrant"
-    config.vm.box_url = "https://github.com/tommy-muehle/puppet-vagrant-boxes/releases/download/1.0.0/centos-6.6-x86_64.box"
+    config.vm.box_url = "/Users/jaspaulbola/boxes/package.box"
     config.vm.hostname = settings["hostname"] ||= "vagrant"
 
     # Configure A Private Network IP
@@ -113,25 +113,6 @@ class Soapbox
             s.args = [db]
           end
         end
-    end
-
-    # Configure All Of The Server Environment Variables
-    if settings.has_key?("variables")
-      settings["variables"].each do |var|
-        config.vm.provision "shell" do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php5/fpm/php-fpm.conf"
-          s.args = [var["key"], var["value"]]
-        end
-
-        config.vm.provision "shell" do |s|
-            s.inline = "echo \"\n#Set Homestead environment variable\nexport $1=$2\" >> /home/vagrant/.profile"
-            s.args = [var["key"], var["value"]]
-        end
-      end
-
-      config.vm.provision "shell" do |s|
-        s.inline = "service php5-fpm restart"
-      end
     end
 
     # Update Composer On Every Provision

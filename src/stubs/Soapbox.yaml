@@ -19,7 +19,3 @@ sites:
 
 databases:
     - database
-
-variables:
-    - key: APP_ENV
-      value: local

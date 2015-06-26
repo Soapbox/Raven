@@ -41,4 +41,4 @@ block="
 echo "$block" > "/etc/httpd/sites-available/$1.conf"
 ln -fs "/etc/httpd/sites-available/$1.conf" "/etc/httpd/sites-enabled/$1.conf"
 
-#service httpd reload
+service httpd reload
