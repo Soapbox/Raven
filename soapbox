@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+
+$_ENV['HOME'] = getenv('HOME');
+$_ENV['VAGRANT_DOTFILE_PATH'] = soapbox_path() . DIRECTORY_SEPARATOR . '.vagrant';
+
+if (file_exists(__DIR__.'/vendor/autoload.php'))
+{
+    require __DIR__.'/vendor/autoload.php';
+}
+else
+{
+    require __DIR__.'/../../autoload.php';
+}
+
+function soapbox_path()
+{
+    if (isset($_SERVER['HOME']))
+    {
+        return $_SERVER['HOME'].'/.soapbox';
+    }
+    else
+    {
+        return $_SERVER['HOMEDRIVE'].$_SERVER['HOMEPATH'].DIRECTORY_SEPARATOR.'.soapbox';
+    }
+}
+
+$app = new Symfony\Component\Console\Application('SoapBox Vagrant', '1.0.0');
+
+$app->run();
