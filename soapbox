@@ -27,4 +27,18 @@ function soapbox_path()
 
 $app = new Symfony\Component\Console\Application('SoapBox Vagrant', '1.0.0');
 
+$app->add(new SoapBox\SoapboxVagrant\DestroyCommand);
+$app->add(new SoapBox\SoapboxVagrant\EditCommand);
+$app->add(new SoapBox\SoapboxVagrant\HaltCommand);
+$app->add(new SoapBox\SoapboxVagrant\InitCommand);
+$app->add(new SoapBox\SoapboxVagrant\MakeCommand);
+$app->add(new SoapBox\SoapboxVagrant\ProvisionCommand);
+$app->add(new SoapBox\SoapboxVagrant\ResumeCommand);
+$app->add(new SoapBox\SoapboxVagrant\RunCommand);
+$app->add(new SoapBox\SoapboxVagrant\UpCommand);
+$app->add(new SoapBox\SoapboxVagrant\UpdateCommand);
+$app->add(new SoapBox\SoapboxVagrant\SshCommand);
+$app->add(new SoapBox\SoapboxVagrant\StatusCommand);
+$app->add(new SoapBox\SoapboxVagrant\SuspendCommand);
+
 $app->run();
