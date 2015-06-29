@@ -17,6 +17,7 @@ Inspired by Laravel Homestead.
 2. Add the above directory to your $PATH variable
 3. symlink the `soapbox` file into the directory created above (step 1)
 4. Run `install.sh`
+5. Run `composer install`
 
 For Example
 ```
