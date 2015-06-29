@@ -10,7 +10,7 @@ Inspired by Laravel Homestead.
 2. Request access to soapbox/soapbox-vagrant
 3. Do the following
   - Run `vagrant box add soapbox/soapbox-vagrant`
-  - If it fails run `vagrant box add soapbox/soapbox-vagrant https://atlas.hashicorp.com/soapbox/boxes/soapbox-vagrant
+  - If it fails run `vagrant box add soapbox/soapbox-vagrant https://atlas.hashicorp.com/soapbox/boxes/soapbox-vagrant`
 
 ### Installing Soapbox-Vagrant
 1. Create a directory ('~/.bin', '~/bin', etc)
