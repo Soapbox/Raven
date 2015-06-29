@@ -11,7 +11,6 @@ class Soapbox
 
     # Configure The Box
     config.vm.box = "soapbox/soapbox-vagrant"
-    config.vm.box_url = "/Users/jaspaulbola/boxes/package.box"
     config.vm.hostname = settings["hostname"] ||= "vagrant"
 
     # Configure A Private Network IP
