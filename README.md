@@ -29,3 +29,9 @@ ln -s ~/.applications/soapbox-vagrant/soapbox ~/.applications/bin/soapbox
 cd ~/.applications/soapbox-vagrant
 composer install
 ```
+
+### Configuration
+1. Run `soapbox edit`
+2. Configure your folders
+3. Configure your sites
+4. Configure your databases
