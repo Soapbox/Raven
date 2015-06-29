@@ -10,7 +10,7 @@ keys:
     - ~/.ssh/id_rsa
 
 folders:
-    - map: ~/Code
+    - map: ~/Development
       to: /home/vagrant/Development/soapbox/soapbox-v4
 
 sites:
