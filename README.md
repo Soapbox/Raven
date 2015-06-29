@@ -20,9 +20,11 @@ Inspired by Laravel Homestead.
 
 For Example
 ```
-mkdir ~/.applications/bin
+mkdir -p ~/.applications/bin
 export PATH=$PATH:~/.applications/bin
 cd ~/.applications
 git clone git@github.com:SoapBox/soapbox-vagrant.git soapbox-vagrant
 ln -s ~/.applications/soapbox-vagrant/soapbox ~/.applications/bin/soapbox
+cd ~/.applications/soapbox-vagrant
+composer install
 ```
