@@ -10,12 +10,12 @@ keys:
     - ~/.ssh/id_rsa
 
 folders:
-    - map: ~/Development
+    - map: ~/Development/soapbox/soapbox-v4
       to: /home/vagrant/Development/soapbox/soapbox-v4
 
 sites:
     - map: soapboxv4.dev
-      to: /home/vagrant/Development/soapbox/soapbox-v4
+      to: /home/vagrant/Development/soapbox/soapbox-v4/public
 
 databases:
     - soapbox-v4
