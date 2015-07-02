@@ -6,9 +6,6 @@ class Soapbox
     # Configure Local Variable To Access Scripts From Remote Location
     scriptDir = File.dirname(__FILE__)
 
-    # Prevent TTY Errors
-    config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-
     # Configure The Box
     config.vm.box = "soapbox/soapbox-vagrant"
     config.vm.hostname = settings["hostname"] ||= "vagrant"
