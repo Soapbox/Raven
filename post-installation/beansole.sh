@@ -1,4 +1,6 @@
 if [ ! -d "/usr/share/Beansole" ]; then
+	echo " --------------- Installing git.... --------------- "
+	sudo yum install -y git
 	echo " ------------ Configuring Beanstalk... ------------ "
 	echo "sudo bash -c 'beanstalkd -l 127.0.0.1 -p 11300 &' -u nobody" >> /etc/rc.local
 	sudo bash -c 'beanstalkd -l 127.0.0.1 -p 11300 &' -u nobody
