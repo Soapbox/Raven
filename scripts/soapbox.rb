@@ -10,6 +10,8 @@ class Soapbox
     config.vm.box = "soapbox/soapbox-vagrant"
     config.vm.hostname = settings["hostname"] ||= "vagrant"
 
+    config.ssh.forward_agent = settings["foward_agent"] ||= true
+
     # Configure A Private Network IP
     config.vm.network :private_network, ip: settings["ip"] ||= "192.168.10.11"
 

@@ -4,6 +4,7 @@ memory: 1024
 cpus: 1
 provider: virtualbox
 
+forward_agent: true
 authorize: ~/.ssh/id_rsa.pub
 
 keys:
