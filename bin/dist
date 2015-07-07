@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Builds the front-end for distribution
+
+bower update --force && npm update --force && grunt dist --uglify

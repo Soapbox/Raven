@@ -1,4 +1,9 @@
+#!/usr/bin/env bash
+
+# Installs the beanstalk web console
+
 if [ ! -d "/usr/share/Beansole" ]; then
+	sudo -v
 	echo " --------------- Installing git.... --------------- "
 	sudo yum install -y git
 	echo " ------------ Configuring Beanstalk... ------------ "
@@ -15,4 +20,5 @@ if [ ! -d "/usr/share/Beansole" ]; then
 	"
 	echo "$vhost" | sudo tee /etc/httpd/conf.d/beansole.app.conf
 	sudo chmod -R 777 /usr/share/Beansole/storage.json # Make storage folder writable by the web server
+	sudo service httpd restart
 fi
