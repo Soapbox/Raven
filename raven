@@ -41,5 +41,6 @@ $app->add(new SoapBox\SoapboxVagrant\SshCommand);
 $app->add(new SoapBox\SoapboxVagrant\StatusCommand);
 $app->add(new SoapBox\SoapboxVagrant\SuspendCommand);
 $app->add(new SoapBox\SoapboxVagrant\SelfUpdateCommand);
+$app->add(new SoapBox\SoapboxVagrant\RefreshCommand);
 
 $app->run();
