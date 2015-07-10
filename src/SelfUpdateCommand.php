@@ -29,8 +29,8 @@ class SelfUpdateCommand extends Command
 	{
 		$process = new Process('git pull', realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
 
-		$process->run(function ($type, $line) use ($output) {
-			$output->write($line);
-		});
+		// $process->run(function ($type, $line) use ($output) {
+		// 	$output->write($line);
+		// });
 	}
 }
