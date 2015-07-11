@@ -1,1 +1,8 @@
-[]
+[
+    {
+        "name": "raven",
+        "sha1": "SHA1(raven)= 5bd6f89bb02e9ec8f0a50493275fec587f5d7a38",
+        "url": "https:\/\/soapbox.github.io\/raven\/releases\/raven-1.0.0",
+        "version": "1.0.0"
+    }
+]
