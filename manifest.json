@@ -16,5 +16,11 @@
         "sha1": "90d94e7f131135a1b733feaffaf1205a08f68d4f",
         "url": "https:\/\/soapbox.github.io\/raven\/releases\/raven-1.0.3",
         "version": "1.0.3"
+    },
+    {
+        "name": "raven.phar",
+        "sha1": "6eb080eed8afedd8d83d8deece29ddb3d10a6f66",
+        "url": "https:\/\/soapbox.github.io\/raven\/releases\/raven-1.0.4",
+        "version": "1.0.4"
     }
 ]
