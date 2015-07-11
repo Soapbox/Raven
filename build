@@ -6,7 +6,7 @@ if [[ $# == 0 ]]; then
 fi
 
 git checkout gh-pages
-git checkout master
+git checkout BetterUpdating
 
 git tag $1
 ./box build
