@@ -1,10 +1,12 @@
 {
 	"chmod" : "0755",
 	"directories" : [
+		"scripts",
 		"src"
 	],
 	"files" : [
-		"vendor/herrera-io/phar-update/res/schema.json"
+		"vendor/herrera-io/phar-update/res/schema.json",
+		"Vagrantfile"
 	],
 	"finder" : [
 		{
