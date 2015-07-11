@@ -53,7 +53,6 @@ class SelfUpdateCommand extends Command
 
 			$update->getFile();
 			$update->copyTo(realpath($_SERVER['argv'][0]));
-
 		}
 
 		// var_dump($this->getApplication()->getVersion());
