@@ -10,7 +10,7 @@ git checkout --quiet BetterUpdating
 
 version=$1
 
-existingTag=$(git tag -l | grep "$version")
+existingTag=$(git tag -l | grep "^$version$")
 
 if [[ $existingTag != "" ]]; then
 	printf "That version already exists.\n"
@@ -26,8 +26,8 @@ git checkout --quiet gh-pages
 cp raven releases/raven-$version
 git add releases/raven-$version
 
-name='raven'
-sha=$(openssl sha1 raven)
+name='raven.phar'
+sha=$(openssl sha1 raven | awk '{ print $2 }')
 url="https://soapbox.github.io/raven/releases/raven-$version"
 
 # Add the new release info to the manifest file
