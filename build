@@ -8,23 +8,43 @@ fi
 git checkout --quiet gh-pages
 git checkout --quiet BetterUpdating
 
-exisingTag=$(git tag -l | grep $1)
+version=$1
 
-echo $existingTag
+existingTag=$(git tag -l | grep "$version")
 
-exit 1
+if [[ $existingTag != "" ]]; then
+	printf "That version already exists.\n"
+	exit 1
+fi
 
-git tag $1
+git tag $version
 ./box build
 mv raven.phar raven
 
-git checkout gh-pages
+git checkout --quiet gh-pages
 
-cp raven releases/raven-$1
+cp raven releases/raven-$version
+git add releases/raven-$version
 
 name='raven'
 sha=$(openssl sha1 raven)
-url="https://soapbox.github.io/raven/releases/raven-$1"
+url="https://soapbox.github.io/raven/releases/raven-$version"
 
 # Add the new release info to the manifest file
-php -r "file_put_contents('manifest.json', json_encode(array_merge(json_decode(file_get_contents(\"manifest.json\"), true), [[\"name\" => \"$name\", \"sha1\" => \"$sha\", \"url\" => \"$url\", \"version\" => \"$1\"]]), JSON_PRETTY_PRINT));"
+php -r "file_put_contents('manifest.json', json_encode(array_merge(json_decode(file_get_contents(\"manifest.json\"), true), [[\"name\" => \"$name\", \"sha1\" => \"$sha\", \"url\" => \"$url\", \"version\" => \"$version\"]]), JSON_PRETTY_PRINT));"
+git add manifest.json
+
+git commit -m "Built version $version of raven"
+
+git checkout --quiet BetterUpdating
+
+read -p "Would you like to deploy this release?[y/n] " -n 1 -r input
+printf "\n"
+
+if [[ $input =~ ^[Yy]$ ]]
+then
+	printf "Deploying raven-$version\n"
+	git push origin gh-pages
+	git push origin $version
+	printf "Completed\n"
+fi
