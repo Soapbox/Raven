@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [[ $# == 0 ]]; then
+	printf "You must specify a release version\n"
+	exit 1
+fi
+
+name='raven'
+sha='asfasf'
+url='45twrt2'
+
+# Add the new release info to the manifest file
+php -r "file_put_contents('manifest.json', json_encode(array_merge(json_decode(file_get_contents(\"manifest.json\"), true), [[\"name\" => \"$name\", \"sha1\" => \"$sha\", \"url\" => \"$url\", \"version\" => \"$1\"]]), JSON_PRETTY_PRINT));"
+
+# git tag $1
+#
+# ./box build
+#
+# mv raven.phar raven

@@ -1,0 +1,17 @@
+{
+	"chmod" : "0755",
+	"directories" : [
+		"src"
+	],
+	"finder" : [
+		{
+			"name" : "*.php",
+			"exclude" : ["Tests"],
+			"in" : "vendor"
+		}
+	],
+	"git-version" : "version",
+	"main" : "bin/raven",
+	"output" : "raven.phar",
+	"stub" : true
+}

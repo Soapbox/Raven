@@ -1,12 +1,15 @@
 <?php namespace SoapBox\SoapboxVagrant;
 
-use Symfony\Component\Process\Process;
+use Herrera\Phar\Update\Manager;
+use Herrera\Phar\Update\Manifest;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SelfUpdateCommand extends Command
 {
+	const MANIFEST = '';
+
 	/**
 	 * Configure the command options.
 	 *
@@ -15,7 +18,7 @@ class SelfUpdateCommand extends Command
 	protected function configure()
 	{
 		$this->setName('self-update')
-			->setDescription('Update me');
+			->setDescription('Updates raven to the latest version');
 	}
 
 	/**
@@ -27,7 +30,7 @@ class SelfUpdateCommand extends Command
 	 */
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
-		$process = new Process('git pull', realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
-		$process->run();
+		$manager = new Manager(Manifest::loadFile(self::MANIFEST));
+		$manager->update($this->getApplication()->getVersion(), true);
 	}
 }
