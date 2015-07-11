@@ -5,8 +5,14 @@ if [[ $# == 0 ]]; then
 	exit 1
 fi
 
-git checkout gh-pages
-git checkout BetterUpdating
+git checkout --quiet gh-pages
+git checkout --quiet BetterUpdating
+
+exisingTag=$(git tag -l | grep $1)
+
+echo $existingTag
+
+exit 1
 
 git tag $1
 ./box build
@@ -14,7 +20,7 @@ mv raven.phar raven
 
 git checkout gh-pages
 
-cp raven releases/raven$1
+cp raven releases/raven-$1
 
 name='raven'
 sha=$(openssl sha1 raven)
@@ -22,9 +28,3 @@ url="https://soapbox.github.io/raven/releases/raven-$1"
 
 # Add the new release info to the manifest file
 php -r "file_put_contents('manifest.json', json_encode(array_merge(json_decode(file_get_contents(\"manifest.json\"), true), [[\"name\" => \"$name\", \"sha1\" => \"$sha\", \"url\" => \"$url\", \"version\" => \"$1\"]]), JSON_PRETTY_PRINT));"
-
-# git tag $1
-#
-# ./box build
-#
-# mv raven.phar raven
