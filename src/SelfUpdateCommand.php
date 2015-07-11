@@ -52,8 +52,8 @@ class SelfUpdateCommand extends Command
 			$process->run();
 
 			$update->getFile();
-			$update->copyTo($this->getRunningFile());
-			
+			$update->copyTo(realpath($_SERVER['argv'][0]));
+
 		}
 
 		// var_dump($this->getApplication()->getVersion());
