@@ -5,11 +5,12 @@ if [[ $# == 0 ]]; then
 	exit 1
 fi
 
-git checkout --quiet gh-pages
-git checkout --quiet BetterUpdating
+git checkout --quiet gh-pages || exit 1
+git checkout --quiet master
 
 version=$1
 
+# Check to see if the version is unique
 existingTag=$(git tag -l | grep "^$version$")
 
 if [[ $existingTag != "" ]]; then
@@ -17,15 +18,18 @@ if [[ $existingTag != "" ]]; then
 	exit 1
 fi
 
+# Add the tag for the version and build the release
 git tag $version
 ./box build
 mv raven.phar raven
 
 git checkout --quiet gh-pages
 
+# Add the new release to the releases folder
 cp raven releases/raven-$version
 git add releases/raven-$version
 
+# Add the new release information to the manifest file
 name='raven.phar'
 sha=$(openssl sha1 raven | awk '{ print $2 }')
 url="https://soapbox.github.io/raven/releases/raven-$version"
@@ -36,8 +40,9 @@ git add manifest.json
 
 git commit -m "Built version $version of raven"
 
-git checkout --quiet BetterUpdating
+git checkout --quiet master
 
+# Promt for deployment
 read -p "Would you like to deploy this release?[y/n] " -n 1 -r input
 printf "\n"
 
