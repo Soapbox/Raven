@@ -24,7 +24,7 @@ class SelfUpdater {
 
 	public function getUpdate($major = true, $pre = false) {
 		$manifest = $this->getManifest();
-		$version = Version::create(this->application->getVersion());
+		$version = Version::create($this->application->getVersion());
 
 		return $manifest->findRecent($version, $major, $pre);
 	}
