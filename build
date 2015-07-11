@@ -23,8 +23,8 @@ mv raven.phar raven
 
 git checkout --quiet gh-pages
 
-cp raven downloads/raven-$version
-git add downloads/raven-$version
+cp raven releases/raven-$version
+git add releases/raven-$version
 
 name='raven.phar'
 sha=$(openssl sha1 raven | awk '{ print $2 }')
