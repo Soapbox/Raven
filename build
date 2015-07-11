@@ -1,13 +1,24 @@
 #!/bin/bash
 
 if [[ $# == 0 ]]; then
-	printf "You must specify a release version\n"
+	printf "Usage: build <version>\n"
 	exit 1
 fi
 
+git checkout gh-pages
+git checkout master
+
+git tag $1
+./box build
+mv raven.phar raven
+
+git checkout gh-pages
+
+cp raven releases/raven$1
+
 name='raven'
-sha='asfasf'
-url='45twrt2'
+sha=$(openssl sha1 raven)
+url="https://soapbox.github.io/raven/releases/raven-$1"
 
 # Add the new release info to the manifest file
 php -r "file_put_contents('manifest.json', json_encode(array_merge(json_decode(file_get_contents(\"manifest.json\"), true), [[\"name\" => \"$name\", \"sha1\" => \"$sha\", \"url\" => \"$url\", \"version\" => \"$1\"]]), JSON_PRETTY_PRINT));"

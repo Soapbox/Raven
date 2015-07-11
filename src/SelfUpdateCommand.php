@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SelfUpdateCommand extends Command
 {
-	const MANIFEST = '';
+	const MANIFEST = 'https://soapbox.github.io/raven/manifest.json';
 
 	/**
 	 * Configure the command options.
