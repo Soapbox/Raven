@@ -6,7 +6,7 @@ if [[ $# == 0 ]]; then
 fi
 
 git checkout --quiet releases || exit 1
-git checkout --quiet master
+git checkout --quiet BetterUpdating
 
 version=$1
 
@@ -40,7 +40,7 @@ git add manifest.json
 
 git commit -m "Built version $version of raven"
 
-git checkout --quiet master
+git checkout --quiet BetterUpdating
 
 # Promt for deployment
 read -p "Would you like to deploy this release?[y/n] " -n 1 -r input
