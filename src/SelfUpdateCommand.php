@@ -47,8 +47,8 @@ class SelfUpdateCommand extends Command
 
 			$output->writeln(sprintf(
 				'<info>raven</info> was successfully updated to version <comment>%s</comment>',
-				$update->getVersion();
-			))
+				$update->getVersion()
+			));
 		}
 	}
 }
