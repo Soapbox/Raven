@@ -34,6 +34,12 @@ class SelfUpdateCommand extends Command
 	{
 		$selfUpdater = new SelfUpdater($this->getApplication());
 		$update = $selfUpdater->getUpdate();
+
+		if (is_null($update)) {
+			$output->writeln('<info>raven<info> is up to date.')
+			return;
+		}
+
 		if ($update->isNewer($selfUpdater->getVersion())) {
 			$output->writeln('New version of <info>raven</info> available.');
 			$output->writeln(sprintf(
