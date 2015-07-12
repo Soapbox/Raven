@@ -32,36 +32,22 @@ class SelfUpdateCommand extends Command
 	 */
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
-		$process = new Process('git fetch --all', realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
-		$process->run();
-
-		$process = new Process('git checkout origin/releases -- manifest.json', realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
-		$process->run();
-
-
 		$selfUpdater = new SelfUpdater($this->getApplication());
 		$update = $selfUpdater->getUpdate();
+		if ($update->isNewer($this->getApplication()->getVersion())) {
+			$output->writeln('New version of <info>raven</raven> available.');
+			$output->writeln(sprintf(
+				'Updating from <comment>%s</comment> to <comment>%s</comment>',
+				$this->getApplication()->getVersion(),
+				$update->getVersnio()
+			));
 
-		if ( !is_null($update) ) {
-			$file = $update->getUrl();
+			$selfUpdater->update();
 
-			$process = new Process("git checkout origin/releases -- releases/$file", realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
-			$process->run();
-
-			$process = new Process("mv releases/$file $file; rm -r releases", realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
-			$process->run();
-
-			$update->getFile();
-			$update->copyTo(realpath($_SERVER['argv'][0]));
+			$output->writeln(sprintf(
+				'<info>raven</info> was successfully updated to version <comment>%s</comment>',
+				$update->getVersion();
+			))
 		}
-
-		// var_dump($this->getApplication()->getVersion());
-		// var_dump($selfUpdater->getLatestVersion());
-		//
-		// $process = new Process('rm manifest.json', realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
-		// $process->run();
-		// die();
-		// $manager = new Manager(Manifest::loadFile(self::MANIFEST));
-		// $manager->update($this->getApplication()->getVersion(), true);
 	}
 }

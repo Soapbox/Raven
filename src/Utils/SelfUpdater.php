@@ -3,12 +3,14 @@
 use Herrera\Phar\Update\Manifest;
 use KevinGH\Version\Version;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Process\Process;
 
 class SelfUpdater {
-	const MANIFEST = 'manifest.json';// 'https://soapbox.github.io/raven/manifest.json';
+	const MANIFEST = 'manifest.json';
 
 	private $application;
 	private $manifest;
+	private $update;
 
 	public function __construct(Application $application) {
 		$this->application = $application;
@@ -22,15 +24,52 @@ class SelfUpdater {
 		return $this->manifest;
 	}
 
-	public function getUpdate($major = true, $pre = false) {
-		$manifest = $this->getManifest();
-		$version = Version::create($this->application->getVersion());
+	private function getVersion() {
+		if (is_null($this->version)) {
+			$this->version = new Version($this->application->getVersion());
+		}
 
-		return $manifest->findRecent($version, $major, $pre);
+		return $this->version;
+	}
+
+	private function run($command, $callback = null) {
+		$process = new Process($command, realpath(__DIR__ . '/../../'), array_merge($_SERVER, $_ENV));
+		$process->run($callback);
+	}
+
+	public function getUpdate($major = true, $pre = false) {
+		if (is_null($this->update)) {
+			$this->run('git fetch --all');
+			$this->run('git checkout origin/releases -- manifest.json');
+
+			$manifest = $this->getManifest();
+			$this->update = $manifest->findRecent($this->getVersion(), $major, $pre);
+
+			$this->run('rm manifest.json');
+		}
+
+		return $this->update;
 	}
 
 	public function update($major = true, $pre = false) {
-		$manager = new Manager($this->getManifest());
-		$manager->update($this->getApplication()->getVersion(), true);
+		$update = $this->getUpdate();
+
+		if ( !is_null($update) && $update->isNewer($this->getVersion()) ) {
+			$newVersion = $update->getVersion();
+			$file = $update->getUrl();
+
+			$this->run("git checkout origin/releases -- releases/$file");
+			$this->run("mv releases/$file $file; rm -r releases");
+
+			$update->getFile();
+
+			$this->run("rm $file");
+
+			$update->copyTo(realpath($_SERVER['argv'][0]));
+
+			return true;
+		}
+
+		return false;
 	}
 }
