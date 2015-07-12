@@ -26,13 +26,13 @@ class SelfUpdater {
 		return $this->manifest;
 	}
 
-	private function getVersion() {
-		return $this->version;
-	}
-
 	private function run($command, $callback = null) {
 		$process = new Process($command, realpath(__DIR__ . '/../../'), array_merge($_SERVER, $_ENV));
 		$process->run($callback);
+	}
+
+	public function getVersion() {
+		return $this->version;
 	}
 
 	public function getUpdate($major = true, $pre = false) {
