@@ -36,12 +36,12 @@ class SelfUpdateCommand extends Command
 		$update = $selfUpdater->getUpdate();
 
 		if (is_null($update)) {
-			$output->writeln('<info>raven</info> is up to date.');
+			$output->writeln(sprintf('<info>%s</info> is up to date.', $this->getApplication()->getName()));
 			return;
 		}
 
 		if ($update->isNewer($selfUpdater->getVersion())) {
-			$output->writeln('New version of <info>raven</info> available.');
+			$output->writeln(sprintf('New version of <info>%s</info> available.', $this->getApplication()->getName()));
 			$output->writeln(sprintf(
 				'Updating from <comment>%s</comment> to <comment>%s</comment>',
 				$this->getApplication()->getVersion(),
@@ -51,7 +51,8 @@ class SelfUpdateCommand extends Command
 			$selfUpdater->update();
 
 			$output->writeln(sprintf(
-				'<info>raven</info> was successfully updated to version <comment>%s</comment>',
+				'<info>%s</info> was successfully updated to version <comment>%s</comment>',
+				$thi->getApplication()->getName(),
 				$update->getVersion()
 			));
 		}
