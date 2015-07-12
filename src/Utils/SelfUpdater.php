@@ -43,6 +43,7 @@ class SelfUpdater {
 			$manifest = $this->getManifest();
 			$this->update = $manifest->findRecent($this->getVersion(), $major, $pre);
 
+			$this->run('git reset HEAD manifest.json');
 			$this->run('rm manifest.json');
 		}
 
@@ -57,6 +58,7 @@ class SelfUpdater {
 			$file = $update->getUrl();
 
 			$this->run("git checkout origin/releases -- releases/$file");
+			$this->run("git reset HEAD releases/$file");
 			$this->run("mv releases/$file $file; rm -r releases");
 
 			$update->getFile();
