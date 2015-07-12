@@ -32,6 +32,7 @@ class SelfUpdateCommand extends Command
 	 */
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
+		//
 		$selfUpdater = new SelfUpdater($this->getApplication());
 		$update = $selfUpdater->getUpdate();
 		if ($update->isNewer($selfUpdater->getVersion())) {
