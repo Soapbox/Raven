@@ -36,7 +36,7 @@ class SelfUpdateCommand extends Command
 		$update = $selfUpdater->getUpdate();
 
 		if (is_null($update)) {
-			$output->writeln('<info>raven<info> is up to date.')
+			$output->writeln('<info>raven<info> is up to date.');
 			return;
 		}
 
