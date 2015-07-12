@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function error {
-	printf "$1"
+	printf "\e[31mError:\e[0m $1"
 	printf "\n"
 	exit 1
 }
@@ -20,7 +20,6 @@ fi
 git checkout --quiet releases &> /dev/null || error "Commit any local changes before building."
 git checkout --quiet $currentBranch
 
-exit 1
 
 version=$1
 
@@ -60,16 +59,10 @@ git add manifest.json
 
 git commit -m "Built version $version of raven"
 
-git checkout --quiet BetterUpdating
+git checkout --quiet $currentBranch
 
-# Promt for deployment
-read -p "Would you like to deploy this release?[y/n] " -n 1 -r input
-printf "\n"
-
-if [[ $input =~ ^[Yy]$ ]]
-then
-	printf "Deploying raven-$version\n"
-	git push origin releases
-	git push origin $version
-	printf "Completed\n"
-fi
+# Deploy the build
+printf "Deploying raven-$version\n"
+git push origin releases
+git push origin $version
+printf "Completed\n"
