@@ -35,7 +35,7 @@ class SelfUpdateCommand extends Command
 		$selfUpdater = new SelfUpdater($this->getApplication());
 		$update = $selfUpdater->getUpdate();
 		if ($update->isNewer($selfUpdater->getVersion())) {
-			$output->writeln('New version of <info>raven</raven> available.');
+			$output->writeln('New version of <info>raven</info> available.');
 			$output->writeln(sprintf(
 				'Updating from <comment>%s</comment> to <comment>%s</comment>',
 				$this->getApplication()->getVersion(),
