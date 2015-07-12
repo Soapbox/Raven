@@ -11,9 +11,11 @@ class SelfUpdater {
 	private $application;
 	private $manifest;
 	private $update;
+	private $version;
 
 	public function __construct(Application $application) {
 		$this->application = $application;
+		$this->version = new Version($this->application->getVersion());
 	}
 
 	private function getManifest() {
@@ -25,10 +27,6 @@ class SelfUpdater {
 	}
 
 	private function getVersion() {
-		if (is_null($this->version)) {
-			$this->version = new Version($this->application->getVersion());
-		}
-
 		return $this->version;
 	}
 
