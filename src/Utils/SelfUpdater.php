@@ -27,7 +27,7 @@ class SelfUpdater {
 	}
 
 	private function run($command, $callback = null) {
-		$process = new Process($command, realpath(__DIR__ . '/../../'), array_merge($_SERVER, $_ENV));
+		$process = new Process($command);
 		$process->run($callback);
 	}
 

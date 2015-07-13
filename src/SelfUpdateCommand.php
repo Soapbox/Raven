@@ -52,7 +52,7 @@ class SelfUpdateCommand extends Command
 
 			$output->writeln(sprintf(
 				'<info>%s</info> was successfully updated to version <comment>%s</comment>',
-				$thi->getApplication()->getName(),
+				$this->getApplication()->getName(),
 				$update->getVersion()
 			));
 		}

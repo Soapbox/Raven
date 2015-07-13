@@ -34,6 +34,12 @@ function getPharPath() {
     return false;
 }
 
+if ( !$dir = getPharPath() ) {
+    $dir = __DIR__ . '/../';
+}
+
+chdir($dir);
+
 $app = new Symfony\Component\Console\Application('Raven', '@version@');
 
 $app->add(new SoapBox\SoapboxVagrant\DestroyCommand);
