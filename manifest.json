@@ -1,1 +1,8 @@
-[]
+[
+    {
+        "name": "raven.phar",
+        "sha1": "b85a05cd292e2b5b80aee504214ea77b8bbf151e",
+        "url": "raven-1.0.0",
+        "version": "1.0.0"
+    }
+]
