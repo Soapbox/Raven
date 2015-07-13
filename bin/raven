@@ -4,9 +4,9 @@
 $_ENV['HOME'] = getenv('HOME');
 $_ENV['VAGRANT_DOTFILE_PATH'] = soapbox_path() . DIRECTORY_SEPARATOR . '.vagrant';
 
-if (file_exists(__DIR__.'/vendor/autoload.php'))
+if (file_exists(__DIR__.'/../vendor/autoload.php'))
 {
-    require __DIR__.'/vendor/autoload.php';
+    require __DIR__.'/../vendor/autoload.php';
 }
 else
 {
@@ -25,7 +25,16 @@ function soapbox_path()
     }
 }
 
-$app = new Symfony\Component\Console\Application('SoapBox Vagrant', '1.0.0');
+function getPharPath() {
+    if ($dir = Phar::running(false)) {
+        $dir = substr($dir, 0, strrpos($dir, '/'));
+        return $dir;
+    }
+
+    return false;
+}
+
+$app = new Symfony\Component\Console\Application('Raven', '@version@');
 
 $app->add(new SoapBox\SoapboxVagrant\DestroyCommand);
 $app->add(new SoapBox\SoapboxVagrant\EditCommand);

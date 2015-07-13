@@ -1,5 +1,6 @@
 <?php namespace SoapBox\SoapboxVagrant;
 
+use Phar;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,7 +28,11 @@ class SshCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        chdir(__DIR__.'/../');
+    	if ( !$dir = getPharPath() ) {
+            $dir = __DIR__ . '/../';
+        }
+        
+        chdir($dir);
 
         passthru($this->setEnvironmentCommand() . ' vagrant ssh');
     }

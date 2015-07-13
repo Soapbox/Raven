@@ -1,0 +1,22 @@
+{
+	"chmod" : "0755",
+	"directories" : [
+		"scripts",
+		"src"
+	],
+	"files" : [
+		"vendor/herrera-io/phar-update/res/schema.json",
+		"Vagrantfile"
+	],
+	"finder" : [
+		{
+			"name" : "*.php",
+			"exclude" : ["Tests"],
+			"in" : "vendor"
+		}
+	],
+	"git-version" : "version",
+	"main" : "bin/raven",
+	"output" : "raven.phar",
+	"stub" : true
+}

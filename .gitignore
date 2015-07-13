@@ -1,3 +1,5 @@
 /vendor
 /.vagrant
 .DS_Store
+raven
+.tags*

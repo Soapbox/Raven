@@ -27,7 +27,11 @@ class ProvisionCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $process = new Process('vagrant provision', realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
+        if ( !$dir = getPharPath() ) {
+            $dir = __DIR__ . '/../';
+        }
+
+        $process = new Process('vagrant provision', realpath($dir), array_merge($_SERVER, $_ENV), null, null);
 
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);

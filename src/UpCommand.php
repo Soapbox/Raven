@@ -29,13 +29,17 @@ class UpCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        if ( !$dir = getPharPath() ) {
+            $dir = __DIR__ . '/../';
+        }
+
         $command = 'vagrant up';
 
         if ($input->getOption('provision')) {
             $command .= ' --provision';
         }
 
-        $process = new Process($command, realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
+        $process = new Process($command, realpath($dir), array_merge($_SERVER, $_ENV), null, null);
 
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);

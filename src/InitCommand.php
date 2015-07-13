@@ -27,15 +27,21 @@ class InitCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($dir = getPharPath()) {
+            $dir .= '/src/';
+        } else {
+            $dir = __DIR__;
+        }
+
         if (is_dir(soapbox_path())) {
             throw new \InvalidArgumentException("SoapBox has already been initialized.");
         }
 
         mkdir(soapbox_path());
 
-        copy(__DIR__.'/stubs/Soapbox.yaml', soapbox_path().'/Soapbox.yaml');
-        copy(__DIR__.'/stubs/after.sh', soapbox_path().'/after.sh');
-        copy(__DIR__.'/stubs/aliases', soapbox_path().'/aliases');
+        copy($dir . '/stubs/Soapbox.yaml', soapbox_path().'/Soapbox.yaml');
+        copy($dir . '/stubs/after.sh', soapbox_path().'/after.sh');
+        copy($dir . '/stubs/aliases', soapbox_path().'/aliases');
 
         $output->writeln('<comment>Creating Soapbox.yaml file...</comment> <info>✔</info>');
         $output->writeln('<comment>Soapbox.yaml file created at:</comment> '.soapbox_path().'/Soapbox.yaml');
