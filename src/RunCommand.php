@@ -31,11 +31,9 @@ class RunCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-	if ($dir = Phar::running(false)) {
-		$dir = substr($dir, 0, strrpos($dir, '/'));
-	} else {
-		$dir = __DIR__ . '/../';
-	}
+    	if ( !$dir = getPharPath() ) {
+    		$dir = __DIR__ . '/../';
+    	}
 
         chdir($dir);
 

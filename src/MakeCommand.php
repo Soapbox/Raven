@@ -59,21 +59,27 @@ class MakeCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        copy(__DIR__.'/stubs/LocalizedVagrantfile', $this->basePath.'/Vagrantfile');
+        if ($dir = getPharPath()) {
+            $dir .= '/src/';
+        } else {
+            $dir = __DIR__;
+        }
+
+        copy($dir . '/stubs/LocalizedVagrantfile', $this->basePath.'/Vagrantfile');
 
         if (!file_exists($this->basePath.'/Soapbox.yaml')) {
-            copy( __DIR__ . '/stubs/Soapbox.yaml', $this->basePath . '/Soapbox.yaml' );
+            copy( $dir . '/stubs/Soapbox.yaml', $this->basePath . '/Soapbox.yaml' );
         }
 
         if ($input->getOption('after')) {
             if (!file_exists($this->basePath.'/after.sh')) {
-                copy( __DIR__ . '/stubs/after.sh', $this->basePath . '/after.sh' );
+                copy( $dir . '/stubs/after.sh', $this->basePath . '/after.sh' );
             }
         }
 
         if ($input->getOption('aliases')) {
             if (!file_exists($this->basePath.'/aliases')) {
-                copy( __DIR__ . '/stubs/aliases', $this->basePath . '/aliases' );
+                copy( $dir . '/stubs/aliases', $this->basePath . '/aliases' );
             }
         }
 

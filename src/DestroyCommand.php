@@ -27,7 +27,11 @@ class DestroyCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $process = new Process('vagrant destroy --force', realpath(__DIR__.'/../'), array_merge($_SERVER, $_ENV), null, null);
+        if ( !$dir = getPharPath() ) {
+            $dir = __DIR__ . '/../';
+        }
+
+        $process = new Process('vagrant destroy --force', realpath($dir), array_merge($_SERVER, $_ENV), null, null);
 
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);

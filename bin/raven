@@ -25,6 +25,15 @@ function soapbox_path()
     }
 }
 
+function getPharPath() {
+    if ($dir = Phar::running(false)) {
+        $dir = substr($dir, 0, strrpos($dir, '/'));
+        return $dir;
+    }
+
+    return false;
+}
+
 $app = new Symfony\Component\Console\Application('Raven', '@version@');
 
 $app->add(new SoapBox\SoapboxVagrant\DestroyCommand);
