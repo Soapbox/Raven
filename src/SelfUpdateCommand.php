@@ -32,6 +32,8 @@ class SelfUpdateCommand extends Command
 	 */
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
+		chRootDir();
+		
 		$selfUpdater = new SelfUpdater($this->getApplication());
 		$update = $selfUpdater->getUpdate();
 

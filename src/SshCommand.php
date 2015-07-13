@@ -28,11 +28,7 @@ class SshCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-    	if ( !$dir = getPharPath() ) {
-            $dir = __DIR__ . '/../';
-        }
-        
-        chdir($dir);
+    	chRootDir();
 
         passthru($this->setEnvironmentCommand() . ' vagrant ssh');
     }

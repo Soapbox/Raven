@@ -25,20 +25,18 @@ function soapbox_path()
     }
 }
 
-function getPharPath() {
+function getRootDir() {
     if ($dir = Phar::running(false)) {
         $dir = substr($dir, 0, strrpos($dir, '/'));
         return $dir;
     }
 
-    return false;
+    return __DIR__ . '/../';
 }
 
-if ( !$dir = getPharPath() ) {
-    $dir = __DIR__ . '/../';
+function chRootDir() {
+    chdir(getRootDir());
 }
-
-chdir($dir);
 
 $app = new Symfony\Component\Console\Application('Raven', '@version@');
 

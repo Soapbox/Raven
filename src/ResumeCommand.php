@@ -27,11 +27,9 @@ class ResumeCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if ( !$dir = getPharPath() ) {
-            $dir = __DIR__ . '/../';
-        }
+        chRootDir();
 
-        $process = new Process('vagrant resume', realpath($dir), array_merge($_SERVER, $_ENV), null, null);
+        $process = new Process('vagrant resume', realpath(getRootDir()), array_merge($_SERVER, $_ENV), null, null);
 
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);

@@ -31,11 +31,7 @@ class RunCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-    	if ( !$dir = getPharPath() ) {
-    		$dir = __DIR__ . '/../';
-    	}
-
-        chdir($dir);
+    	chRootDir();
 
         $command = $input->getArgument('ssh-command');
 

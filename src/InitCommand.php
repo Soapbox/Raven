@@ -27,7 +27,7 @@ class InitCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($dir = getPharPath()) {
+        if ($dir = getRootDir()) {
             $dir .= '/src/';
         } else {
             $dir = __DIR__;

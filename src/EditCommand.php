@@ -27,13 +27,11 @@ class EditCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if ( !$dir = getPharPath() ) {
-            $dir = __DIR__ . '/../';
-        }
+        chRootDir();
 
         $command = $this->executable().' '.soapbox_path().'/Soapbox.yaml';
 
-        $process = new Process($command, realpath($dir), array_merge($_SERVER, $_ENV), null, null);
+        $process = new Process($command, realpath(getRootDir()), array_merge($_SERVER, $_ENV), null, null);
 
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);
