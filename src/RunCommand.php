@@ -1,6 +1,5 @@
 <?php namespace SoapBox\SoapboxVagrant;
 
-use Phar;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

@@ -1,11 +1,9 @@
 <?php namespace SoapBox\SoapboxVagrant;
 
+use RuntimeException;
 use SoapBox\SoapboxVagrant\Utils\Command;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Process;
 
 class RefreshCommand extends Command
@@ -15,14 +13,13 @@ class RefreshCommand extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$process = new Process("php artisan migrate:rollback", getcwd(), array_merge($_SERVER, $_ENV));
+		$process = new Process("php artisan migrate:refresh --seed --ansi");
 		$process->run(function ($type, $line) use ($output) {
 				$output->write($line);
 		});
-
-		$process = new Process("php artisan migrate --seed", getcwd(), array_merge($_SERVER, $_ENV));
-		$process->run(function ($type, $line) use ($output) {
-				$output->write($line);
-		});
+		
+		if ( !$process->isSuccessful() ) {
+			throw new RuntimeException('Failed to rollback and re-run the database migraions.');
+		}
 	}
 }
