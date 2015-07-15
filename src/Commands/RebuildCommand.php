@@ -1,7 +1,7 @@
-<?php namespace SoapBox\SoapboxVagrant\Commands;
+<?php namespace SoapBox\Raven\Commands;
 
 use RuntimeException;
-use SoapBox\SoapboxVagrant\RunCommand;
+use SoapBox\Raven\Commands\RunCommand;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

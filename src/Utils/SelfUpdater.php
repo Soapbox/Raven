@@ -1,4 +1,4 @@
-<?php namespace SoapBox\SoapboxVagrant\Utils;
+<?php namespace SoapBox\Raven\Utils;
 
 use Herrera\Phar\Update\Manifest;
 use KevinGH\Version\Version;

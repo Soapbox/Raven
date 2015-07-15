@@ -1,11 +1,11 @@
-<?php namespace SoapBox\SoapboxVagrant;
+<?php namespace SoapBox\Raven\Commands;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class HaltCommand extends Command
+class SuspendCommand extends Command
 {
     /**
      * Configure the command options.
@@ -14,8 +14,8 @@ class HaltCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('halt')
-                  ->setDescription('Halt the SoapBox machine');
+        $this->setName('suspend')
+                  ->setDescription('Suspend the SoapBox machine');
     }
 
     /**
@@ -29,7 +29,7 @@ class HaltCommand extends Command
     {
         chRootDir();
 
-        $process = new Process('vagrant halt', realpath(getRootDir()), array_merge($_SERVER, $_ENV), null, null);
+        $process = new Process('vagrant suspend', realpath(getRootDir()), array_merge($_SERVER, $_ENV), null, null);
 
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);

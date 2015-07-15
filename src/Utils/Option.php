@@ -1,4 +1,4 @@
-<?php namespace SoapBox\SoapboxVagrant\Utils;
+<?php namespace SoapBox\Raven\Utils;
 
 use Symfony\Component\Console\Input\InputOption;
 
@@ -73,5 +73,13 @@ class Option
 			$this->description,
 			$this->default
 		);
+	}
+
+	public function optional() {
+		$this->setMode(InputOption::VALUE_OPTIONAL);
+	}
+
+	public function required() {
+		$this->setMode(InputOption::VALUE_REQUIRED);
 	}
 }
