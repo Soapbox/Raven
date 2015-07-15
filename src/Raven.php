@@ -5,6 +5,7 @@ use SoapBox\Raven\Commands;
 use SoapBox\Raven\Utils\RavenStorage;
 use SoapBox\Raven\Utils\SelfUpdater;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -73,6 +74,13 @@ class Raven extends Application {
 
 		return false;
 	}
+
+	/**
+	 * Initialize custom styles
+	 */
+	private function initializeStyles(OutputInterface $output) {
+		$output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
+	}
 	
 	public function run(InputInterface $input = null, OutputInterface $output = null)
 	{
@@ -85,11 +93,12 @@ class Raven extends Application {
         }
 
         $this->configureIO($input, $output);
+        $this->initializeStyles($output);
 
         $command = $this->getCommandName($input);
 
 		if ($this->isOutdated() && $command != $this->selfUpdateCommand->getName()) {
-			$output->writeln(sprintf("<fg=black;bg=yellow>There is a newer version of %s available. Run %s to update.</fg=black;bg=yellow>\n",
+			$output->writeln(sprintf("<warning>There is a newer version of %s available. Run %s to update.</warning>\n",
 				$this->getName(),
 				$this->selfUpdateCommand->getName()
 			));
