@@ -1,11 +1,9 @@
-<?php namespace SoapBox\SoapboxVagrant\Commands;
+<?php namespace SoapBox\Raven\Commands;
 
 use RuntimeException;
-use SoapBox\SoapboxVagrant\Utils\Command;
-use Symfony\Component\Process\Process;
+use SoapBox\Raven\Utils\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class ClearCacheCommand extends Command {
 	protected $command = 'clear-cache';

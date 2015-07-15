@@ -1,11 +1,11 @@
-<?php namespace SoapBox\SoapboxVagrant;
+<?php namespace SoapBox\Raven\Commands;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ProvisionCommand extends Command
+class EditCommand extends Command
 {
     /**
      * Configure the command options.
@@ -14,8 +14,8 @@ class ProvisionCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('provision')
-            ->setDescription('Re-provisions the SoapBox machine');
+        $this->setName('edit')
+                  ->setDescription('Edit the Soapbox.yaml file');
     }
 
     /**
@@ -29,10 +29,28 @@ class ProvisionCommand extends Command
     {
         chRootDir();
 
-        $process = new Process('vagrant provision', realpath(getRootDir()), array_merge($_SERVER, $_ENV), null, null);
+        $command = $this->executable().' '.soapbox_path().'/Soapbox.yaml';
+
+        $process = new Process($command, realpath(getRootDir()), array_merge($_SERVER, $_ENV), null, null);
 
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);
         });
+    }
+
+    /**
+     * Find the correct executable to run depending on the OS.
+     *
+     * @return string
+     */
+    protected function executable()
+    {
+        if (strpos(strtoupper(PHP_OS), 'WIN') === 0) {
+            return 'start';
+        } elseif (strpos(strtoupper(PHP_OS), 'DARWIN') === 0) {
+            return 'open';
+        }
+
+        return 'xdg-open';
     }
 }

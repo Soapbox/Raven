@@ -15,7 +15,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "SoapBox\\SoapboxVagrant\\": "src/"
+            "SoapBox\\Raven\\": "src/"
         }
     },
     "bin": [

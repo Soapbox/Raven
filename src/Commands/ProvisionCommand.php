@@ -1,11 +1,11 @@
-<?php namespace SoapBox\SoapboxVagrant;
+<?php namespace SoapBox\Raven\Commands;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class StatusCommand extends Command
+class ProvisionCommand extends Command
 {
     /**
      * Configure the command options.
@@ -14,8 +14,8 @@ class StatusCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('status')
-                  ->setDescription('Get the status of the SoapBox machine');
+        $this->setName('provision')
+            ->setDescription('Re-provisions the SoapBox machine');
     }
 
     /**
@@ -29,7 +29,7 @@ class StatusCommand extends Command
     {
         chRootDir();
 
-        $process = new Process('vagrant status', realpath(getRootDir()), array_merge($_SERVER, $_ENV), null, null);
+        $process = new Process('vagrant provision', realpath(getRootDir()), array_merge($_SERVER, $_ENV), null, null);
 
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);

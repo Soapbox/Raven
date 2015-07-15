@@ -1,12 +1,12 @@
-<?php namespace SoapBox\SoapboxVagrant;
+<?php namespace SoapBox\Raven\Commands;
 
-use Phar;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SshCommand extends Command
+class RunCommand extends Command
 {
     /**
      * Configure the command options.
@@ -15,8 +15,10 @@ class SshCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('ssh')
-                  ->setDescription('Login to the SoapBox machine via SSH');
+        $this
+            ->setName('run')
+            ->setDescription('Run commands through the SoapBox machine via SSH')
+            ->addArgument('ssh-command', InputArgument::REQUIRED, 'The command to pass through to the virtual machine.');
     }
 
     /**
@@ -30,7 +32,9 @@ class SshCommand extends Command
     {
     	chRootDir();
 
-        passthru($this->setEnvironmentCommand() . ' vagrant ssh');
+        $command = $input->getArgument('ssh-command');
+
+        passthru($this->setEnvironmentCommand() . ' vagrant ssh -c "'.$command.'"');
     }
 
     protected function setEnvironmentCommand()

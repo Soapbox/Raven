@@ -1,4 +1,4 @@
-<?php namespace SoapBox\SoapboxVagrant\Utils;
+<?php namespace SoapBox\Raven\Utils;
 
 use Closure;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
