@@ -64,8 +64,13 @@ class Raven extends Application {
 
 		$this->storage->set('last_update_check', time());
 
+		$currentDir = getcwd();
+		chRootDir();
+
 		$selfUpdater = new SelfUpdater($this);
 		$update = $selfUpdater->getUpdate();
+		
+		chdir($currentDir);
 
 		if ( !is_null($update) && $update->isNewer($selfUpdater->getVersion()) ) {
 			$this->storage->set('latest_version', (string) $update->getVersion());
