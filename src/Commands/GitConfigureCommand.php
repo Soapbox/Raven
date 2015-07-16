@@ -11,8 +11,16 @@ class GitConfigureCommand extends Command
 	protected $command = 'git-configure';
 	protected $description = 'Configure git hooks for the current repository.';
 
+	protected function addOptions() {
+		$this->makeOption('new-only')
+			->setDescription('Only install the hooks that do not exist.')
+			->boolean();
+	}
+
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		$output->writeln('<info>Configuring git hooks...</info>');
+
 		$process = new Process("git pull");
 		$process->run();
 
@@ -23,14 +31,19 @@ class GitConfigureCommand extends Command
 			throw new RuntimeException('You are not currently in a git repository.');
 		}
 
-		$gitHookDir = $process->getOutput() . '/.git/hooks/';
-
-		$files = glob(getRootDir() . '/git-hooks/*');
+		$gitHookDir = trim($process->getOutput(), " \n\r") . '/.git/hooks/';
+		$files = glob(getRootDir() . '/scripts/git-hooks/*');
 
 		foreach ($files as $file) {
 			if (is_file($file)) {
-				copy($file, $gitHookDir);
+				$newFile = $gitHookDir . substr($file, strrpos($file, '/') + 1);
+				if($input->getOption('new-only') && file_exists($newFile)) {
+					continue;
+				}
+				copy($file, $newFile);
 			}
 		}
+
+		$output->writeln('<info>Completed.</info>');
 	}
 }

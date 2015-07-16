@@ -82,4 +82,8 @@ class Option
 	public function required() {
 		$this->setMode(InputOption::VALUE_REQUIRED);
 	}
+
+	public function boolean() {
+		$this->setMode(InputOption::VALUE_NONE);
+	}
 }
