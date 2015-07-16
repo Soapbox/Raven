@@ -31,6 +31,7 @@ class Raven extends Application {
 		$this->add(new Commands\ClearCacheCommand);
 		$this->add(new Commands\DestroyCommand);
 		$this->add(new Commands\EditCommand);
+		$this->add(new Commands\GitConfigureCommand);
 		$this->add(new Commands\HaltCommand);
 		$this->add(new Commands\InitCommand);
 		$this->add(new Commands\MakeCommand);
