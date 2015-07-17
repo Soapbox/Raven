@@ -27,7 +27,7 @@ class GitConfigureCommand extends Command
 		$process = new Process("git rev-parse --show-toplevel");
 		$process->run();
 		
-		if ( !$process->isSuccessful() ) {
+		if ( !$process->isSuccessful() ||  $process->getOutput() == '') {
 			throw new RuntimeException('You are not currently in a git repository.');
 		}
 
@@ -41,6 +41,7 @@ class GitConfigureCommand extends Command
 					continue;
 				}
 				copy($file, $newFile);
+				chmod($newFile, fileperms($file));
 			}
 		}
 
