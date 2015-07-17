@@ -1,3 +1,5 @@
 #!/bin/bash
 
-composer install --no-scripts
+if [[ $1 != $2 ]]; then
+	composer install --no-scripts
+fi
