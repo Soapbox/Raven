@@ -45,7 +45,7 @@ class Raven extends Application {
 		$this->add(new Commands\SuspendCommand);
 		$this->add(new Commands\UpCommand);
 		$this->add(new Commands\UpdateCommand);
-		$this->add(new Commands\TestCommand);
+		// $this->add(new Commands\TestCommand);
 	}
 
 	/**
