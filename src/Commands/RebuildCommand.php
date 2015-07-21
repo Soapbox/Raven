@@ -1,7 +1,6 @@
 <?php namespace SoapBox\Raven\Commands;
 
 use RuntimeException;
-use SoapBox\Raven\Commands\RunCommand;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,12 +10,8 @@ class RebuildCommand extends RunCommand {
 	protected $command = 'rebuild';
 	protected $description = 'Rebuild the database';
 
-    protected function configure()
-    {
-        $this
-            ->setName($this->command)
-            ->setDescription($this->description);
-    }
+	protected function addArguments() {}
+	protected function addOptions() {}
 
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
@@ -33,7 +28,7 @@ class RebuildCommand extends RunCommand {
 
 		$returnStatus = 0;
 
-		passthru($this->setEnvironmentCommand() . ' vagrant ssh -c "' . $command . '" &> /dev/null', $returnStatus);
+		$this->runCommand($command, $returnStatus, false);
 
 		if ($returnStatus !== 0) {
 			throw new RuntimeException('Failed to rebuild the database.');

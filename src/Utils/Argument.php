@@ -1,14 +1,13 @@
 <?php namespace SoapBox\Raven\Utils;
 
-use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
-class Option
+class Argument
 {
 	private $default;
 	private $description;
 	private $mode;
 	private $name;
-	private $shortcuts = [];
 
 	public function __construct($name)
 	{
@@ -53,22 +52,10 @@ class Option
 		return $this->mode;
 	}
 
-	public function addShortcut($shortcut)
-	{
-		$this->shortcuts[] = $shortcut;
-		return $this;
-	}
-
-	public function getShortcut()
-	{
-		return $this->shortcuts;
-	}
-
 	public function get()
 	{
-		return new InputOption(
+		return new InputArgument(
 			$this->name,
-			$this->shortcuts,
 			$this->mode,
 			$this->description,
 			$this->default
@@ -76,22 +63,14 @@ class Option
 	}
 
 	public function optional() {
-		$this->setMode(InputOption::VALUE_OPTIONAL);
+		$this->setMode(InputArgument::OPTIONAL);
 	}
 
 	public function required() {
-		$this->setMode(InputOption::VALUE_REQUIRED);
-	}
-
-	public function boolean() {
-		$this->setMode(InputOption::VALUE_NONE);
+		$this->setMode(InputArgument::REQUIRED);
 	}
 
 	public function isArray() {
-		$this->setMode(InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL);
-
-		if (is_null($this->default)) {
-			$this->default = [];
-		}
+		$this->setMode(InputArgument::IS_ARRAY);
 	}
 }

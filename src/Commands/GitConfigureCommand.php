@@ -21,8 +21,13 @@ class GitConfigureCommand extends Command
 	{
 		$output->writeln('<info>Configuring git hooks...</info>');
 
+		$currentDir = getcwd();
+		chRootDir();
+
 		$process = new Process("git pull");
 		$process->run();
+
+		chdir($currentDir);
 
 		$process = new Process("git rev-parse --show-toplevel");
 		$process->run();

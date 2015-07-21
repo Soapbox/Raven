@@ -55,4 +55,11 @@ class Command extends SymfonyCommand
 		$this->options[] = $option;
 		return $option;
 	}
+
+	protected function makeArgument($name)
+	{
+		$argument = new Argument($name);
+		$this->arguments[] = $argument;
+		return $argument;
+	}
 }
