@@ -43,6 +43,7 @@ class Raven extends Application {
 		$this->add(new Commands\SshCommand);
 		$this->add(new Commands\StatusCommand);
 		$this->add(new Commands\SuspendCommand);
+		$this->add(new Commands\WatchLogCommand);
 		$this->add(new Commands\UpCommand);
 		$this->add(new Commands\UpdateCommand);
 		// $this->add(new Commands\TestCommand);
@@ -71,7 +72,7 @@ class Raven extends Application {
 
 		$selfUpdater = new SelfUpdater($this);
 		$update = $selfUpdater->getUpdate();
-		
+
 		chdir($currentDir);
 
 		if ( !is_null($update) && $update->isNewer($selfUpdater->getVersion()) ) {
@@ -88,7 +89,7 @@ class Raven extends Application {
 	private function initializeStyles(OutputInterface $output) {
 		$output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
 	}
-	
+
 	public function run(InputInterface $input = null, OutputInterface $output = null)
 	{
 		if (null === $input) {
