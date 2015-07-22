@@ -43,6 +43,7 @@ git tag $version
 mv raven.phar raven
 
 git checkout --quiet releases
+git pull
 
 # Add the new release to the releases folder
 cp raven releases/raven-$version
