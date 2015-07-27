@@ -7,7 +7,9 @@ function error {
 }
 
 if [[ $# == 0 ]]; then
-	error "Usage: build <version>"
+	./box build
+	mv raven.phar raven
+	exit
 fi
 
 # Check branch
