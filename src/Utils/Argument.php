@@ -6,7 +6,7 @@ class Argument
 {
 	private $default;
 	private $description;
-	private $mode;
+	private $mode = InputArgument::REQUIRED;
 	private $name;
 
 	public function __construct($name)

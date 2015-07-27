@@ -46,6 +46,7 @@ class Raven extends Application {
 		$this->add(new Commands\WatchLogCommand);
 		$this->add(new Commands\UpCommand);
 		$this->add(new Commands\UpdateCommand);
+		$this->add(new Commands\WorkbenchCommand);
 		// $this->add(new Commands\TestCommand);
 	}
 
