@@ -13,7 +13,8 @@ class WorkbenchCommand extends Command {
 
 	protected function addArguments() {
 		$this->makeArgument('repository')
-			->setDescription('The repository for which the workbench folder will be set up.');
+			->setDescription('The repository for which the workbench folder will be set up.')
+			->required();
 	}
 
 	protected function addOptions() {}
