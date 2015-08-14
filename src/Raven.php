@@ -4,7 +4,9 @@ use KevinGH\Version\Version;
 use SoapBox\Raven\Commands;
 use SoapBox\Raven\Utils\RavenStorage;
 use SoapBox\Raven\Utils\SelfUpdater;
+use SoapBox\Raven\Utils\DispatcherCommand;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Raven extends Application {
 	private $selfUpdateCommand;
 	private $storage;
+	private $commands = [];
 
 	public function __construct($name = 'Raven', $version = '@version@')
 	{
@@ -25,8 +28,8 @@ class Raven extends Application {
 
 	private function registerCommands()
 	{
-		$this->selfUpdateCommand = new Commands\SelfUpdateCommand;
-		$this->add($this->selfUpdateCommand);
+		$this->selfUpdateCommand = $this->add(new Commands\SelfUpdateCommand);
+		// $this->add($this->selfUpdateCommand);
 
 		$this->add(new Commands\ClearCacheCommand);
 		$this->add(new Commands\DestroyCommand);
@@ -47,13 +50,16 @@ class Raven extends Application {
 		$this->add(new Commands\UpCommand);
 		$this->add(new Commands\UpdateCommand);
 		$this->add(new Commands\WorkbenchCommand);
-		// $this->add(new Commands\TestCommand);
+		$this->add(new Commands\TestCommand);
+		$this->add(new Commands\UtilCommand);
+		$this->add(new Commands\HelpCommand);
 	}
 
 	/**
 	 * Check to see if the current version of Raven is out of date
 	 */
-	private function isOutdated() {
+	private function isOutdated()
+	{
 		$currentVersion = new Version($this->getVersion());
 		$latestVersion = new Version($this->storage->get('latest_version'));
 		if ($latestVersion->isGreaterThan($currentVersion)) {
@@ -87,7 +93,8 @@ class Raven extends Application {
 	/**
 	 * Initialize custom styles
 	 */
-	private function initializeStyles(OutputInterface $output) {
+	private function initializeStyles(OutputInterface $output)
+	{
 		$output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
 	}
 
@@ -97,12 +104,12 @@ class Raven extends Application {
             $input = new ArgvInput();
         }
 
-        if (null === $output) {
-            $output = new ConsoleOutput();
-        }
+		return parent::run($input, $output);
+	}
 
-        $this->configureIO($input, $output);
-        $this->initializeStyles($output);
+	public function doRun(InputInterface $input, OutputInterface $output)
+	{
+		$this->initializeStyles($output);
 
         $command = $this->getCommandName($input);
 
@@ -113,6 +120,26 @@ class Raven extends Application {
 			));
 		}
 
-		return parent::run($input, $output);
+		return parent::doRun($input, $output);
+	}
+
+	public function add(Command $command) 
+	{
+		$this->commands[$command->getName()] = $command;
+
+		return parent::add($command);
+	}
+
+	public function get($name) 
+	{
+		if (isset($this->commands[$name])) {
+			$command = $this->commands[$name];
+
+			if ($command instanceof DispatcherCommand) {
+				return $command;
+			}
+		}
+
+		return parent::get($name);
 	}
 }
