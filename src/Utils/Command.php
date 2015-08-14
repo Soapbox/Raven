@@ -1,6 +1,7 @@
 <?php namespace SoapBox\Raven\Utils;
 
 use Closure;
+use SoapBox\Raven\Utils\HelpSection;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,6 +16,7 @@ class Command extends SymfonyCommand
 	protected $description = '';
 	private $options = [];
 	private $arguments = [];
+	private $helpSections = [];
 
 	protected function configure()
 	{
@@ -61,5 +63,19 @@ class Command extends SymfonyCommand
 		$argument = new Argument($name);
 		$this->arguments[] = $argument;
 		return $argument;
+	}
+
+	protected function makeSection($title) {
+		$key = strtolower(str_replace(' ', '_', $title));
+
+		$section = new HelpSection();
+		$section->setTitle($title);
+		$this->helpSections[$key] = $section;
+
+		return $section;
+	}
+
+	public function getHelpSections() {
+		return $this->helpSections;
 	}
 }
