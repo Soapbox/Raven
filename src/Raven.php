@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Raven extends Application {
-	private $selfUpdateCommand;
+	// private $selfUpdateCommand;
 	private $storage;
 	private $commands = [];
 
@@ -28,31 +28,15 @@ class Raven extends Application {
 
 	private function registerCommands()
 	{
-		$this->selfUpdateCommand = $this->add(new Commands\SelfUpdateCommand);
-		// $this->add($this->selfUpdateCommand);
+		$dir = __DIR__ . '/Commands';
+		$files = scandir($dir);
 
-		$this->add(new Commands\ClearCacheCommand);
-		$this->add(new Commands\DestroyCommand);
-		$this->add(new Commands\EditCommand);
-		$this->add(new Commands\GitConfigureCommand);
-		$this->add(new Commands\HaltCommand);
-		$this->add(new Commands\InitCommand);
-		$this->add(new Commands\MakeCommand);
-		$this->add(new Commands\ProvisionCommand);
-		$this->add(new Commands\RebuildCommand);
-		$this->add(new Commands\RefreshCommand);
-		$this->add(new Commands\ResumeCommand);
-		$this->add(new Commands\RunCommand);
-		$this->add(new Commands\SshCommand);
-		$this->add(new Commands\StatusCommand);
-		$this->add(new Commands\SuspendCommand);
-		$this->add(new Commands\WatchLogCommand);
-		$this->add(new Commands\UpCommand);
-		$this->add(new Commands\UpdateCommand);
-		$this->add(new Commands\WorkbenchCommand);
-		$this->add(new Commands\TestCommand);
-		$this->add(new Commands\UtilCommand);
-		$this->add(new Commands\HelpCommand);
+		foreach ($files as $file) {
+			if (is_file($dir . '/' . $file)) {
+				$class = sprintf('SoapBox\Raven\Commands\%s', rtrim($file, '.php'));
+				$this->add(new $class);
+			}
+		}
 	}
 
 	/**
@@ -113,10 +97,10 @@ class Raven extends Application {
 
         $command = $this->getCommandName($input);
 
-		if ($this->isOutdated() && $command != $this->selfUpdateCommand->getName()) {
+		if ($this->isOutdated() && $command != 'self-update') {
 			$output->writeln(sprintf("<warning>There is a newer version of %s available. Run %s to update.</warning>\n",
 				$this->getName(),
-				$this->selfUpdateCommand->getName()
+				'self-update'
 			));
 		}
 
