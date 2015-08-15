@@ -2,13 +2,13 @@
 
 use KevinGH\Version\Version;
 use SoapBox\Raven\Commands;
+use SoapBox\Raven\Utils\ArgvInput;
+use SoapBox\Raven\Utils\DispatcherCommand;
 use SoapBox\Raven\Utils\RavenStorage;
 use SoapBox\Raven\Utils\SelfUpdater;
-use SoapBox\Raven\Utils\DispatcherCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,7 +34,7 @@ class Raven extends Application {
 		foreach ($files as $file) {
 			if (is_file($dir . '/' . $file)) {
 				$class = sprintf('SoapBox\Raven\Commands\%s', rtrim($file, '.php'));
-				$this->add(new $class);
+				$c = $this->add(new $class);
 			}
 		}
 	}
@@ -85,8 +85,13 @@ class Raven extends Application {
 	public function run(InputInterface $input = null, OutputInterface $output = null)
 	{
 		if (null === $input) {
-            $input = new ArgvInput();
-        }
+			$input = new ArgvInput();
+		}
+
+		$command = $this->get($this->getCommandName($input));
+		if ($command instanceof DispatcherCommand) {
+			$input->makeDispatcher();
+		}
 
 		return parent::run($input, $output);
 	}
@@ -95,7 +100,7 @@ class Raven extends Application {
 	{
 		$this->initializeStyles($output);
 
-        $command = $this->getCommandName($input);
+		$command = $this->getCommandName($input);
 
 		if ($this->isOutdated() && $command != 'self-update') {
 			$output->writeln(sprintf("<warning>There is a newer version of %s available. Run %s to update.</warning>\n",
