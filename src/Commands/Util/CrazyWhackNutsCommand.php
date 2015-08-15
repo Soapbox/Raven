@@ -1,4 +1,4 @@
-<?php namespace SoapBox\Raven\Commands\Utility;
+<?php namespace SoapBox\Raven\Commands\Util;
 
 use RuntimeException;
 use SoapBox\Raven\Utils\Command;
