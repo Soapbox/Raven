@@ -77,14 +77,17 @@ class Option
 
 	public function optional() {
 		$this->setMode(InputOption::VALUE_OPTIONAL);
+		return $this;
 	}
 
 	public function required() {
 		$this->setMode(InputOption::VALUE_REQUIRED);
+		return $this;
 	}
 
 	public function boolean() {
 		$this->setMode(InputOption::VALUE_NONE);
+		return $this;
 	}
 
 	public function isArray() {
@@ -93,5 +96,6 @@ class Option
 		if (is_null($this->default)) {
 			$this->default = [];
 		}
+		return $this;
 	}
 }

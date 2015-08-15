@@ -2,8 +2,8 @@
 
 use Herrera\Phar\Update\Manager;
 use Herrera\Phar\Update\Manifest;
+use SoapBox\Raven\Utils\Command;
 use SoapBox\Raven\Utils\SelfUpdater;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
@@ -12,15 +12,19 @@ class SelfUpdateCommand extends Command
 {
 	const MANIFEST = 'https://soapbox.github.io/raven/manifest.json';
 
-	/**
-	 * Configure the command options.
-	 *
-	 * @return void
-	 */
-	protected function configure()
-	{
-		$this->setName('self-update')
-			->setDescription('Updates raven to the latest version');
+	protected $command = 'self-update';
+	protected $description = 'TUpdates raven to the latest version';
+
+	protected function addArguments() {}
+
+	protected function addOptions() {
+		$this->makeOption('pre')
+			->setDescription('Allow updating to pre-releases')
+			->boolean();
+
+		$this->makeOption('major')
+			->setDescription('Allow updating major releases')
+			->boolean();
 	}
 
 	/**
@@ -35,7 +39,9 @@ class SelfUpdateCommand extends Command
 		chRootDir();
 		
 		$selfUpdater = new SelfUpdater($this->getApplication());
-		$update = $selfUpdater->getUpdate();
+		$major = $input->getOption('major');
+		$pre = $input->getOption('pre');
+		$update = $selfUpdater->getUpdate($major, $pre);
 
 		if (is_null($update)) {
 			$output->writeln(sprintf('<info>%s</info> is up to date.', $this->getApplication()->getName()));
@@ -50,7 +56,7 @@ class SelfUpdateCommand extends Command
 				$update->getVersion()
 			));
 
-			$selfUpdater->update();
+			$selfUpdater->update($major, $pre);
 
 			$output->writeln(sprintf(
 				'<info>%s</info> was successfully updated to version <comment>%s</comment>',

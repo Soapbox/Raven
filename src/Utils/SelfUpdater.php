@@ -35,10 +35,20 @@ class SelfUpdater {
 		return $this->version;
 	}
 
-	public function getUpdate($major = true, $pre = false) {
+	public function getUpdate($major = false, $pre = false) {
 		if (is_null($this->update)) {
 			$this->run('git fetch --all');
 			$this->run('git checkout origin/releases -- manifest.json');
+
+			if (!$pre && !empty($this->version->getPreRelease())) {
+				if ($major) {
+					$this->version->setMajor(0);
+				}
+
+				$this->version->setMinor(0);
+				$this->version->setPatch(0);
+				$this->version->setPreRelease(0);
+			}
 
 			$manifest = $this->getManifest();
 			$this->update = $manifest->findRecent($this->getVersion(), $major, $pre);
@@ -50,7 +60,7 @@ class SelfUpdater {
 		return $this->update;
 	}
 
-	public function update($major = true, $pre = false) {
+	public function update($major = false, $pre = false) {
 		$update = $this->getUpdate();
 
 		if ( !is_null($update) && $update->isNewer($this->getVersion()) ) {
