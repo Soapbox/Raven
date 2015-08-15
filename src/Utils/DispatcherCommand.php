@@ -13,14 +13,7 @@ abstract class DispatcherCommand extends Command {
 	private $commands = [];
 	private $commandString;
 	private $argv;
-
-	public function __construct($name = null)
-	{
-		parent::__construct($name);
-
-		$this->registerCommands();
-		$this->generateCommandList();
-	}
+	private $commandsRegistered = false;
 
 	public function getSynopsis($bool = false) {
 		return sprintf('%s command [options] [arguments]', $this->getName());
@@ -29,7 +22,8 @@ abstract class DispatcherCommand extends Command {
 	/**
 	 * This method generated the available command list for the help output.
 	 */
-	private function generateCommandList() {
+	public function generateCommandList() {
+		$this->registerCommands();
 		$section = $this->makeSection('Available commands');
 
 		$maxLength = 0;
@@ -56,10 +50,12 @@ abstract class DispatcherCommand extends Command {
 	 * @param Symfony\Component\Console\Input\InputInterface $input The command's input
 	 */
 	private function setUp(InputInterface $input) {
-		$argv = $input->getArgument('args');
-		if (count($argv) > 0) {
-			$this->commandString = $argv[0];
-			$this->argv = array_merge([$this->getName()], $argv);
+		$this->registerCommands();
+
+		$this->argv = $_SERVER['argv'];
+		array_shift($this->argv);
+		if (count($this->argv) > 1) {
+			$this->commandString = $this->argv[1];
 		}
 	}
 
@@ -81,6 +77,7 @@ abstract class DispatcherCommand extends Command {
 				$command = new $class;
 				$command->setApplication($this->getApplication());
 				$command->setDefinition(new InputDefinition());
+				$command->generateCommandList();
 			}
 
 			$helpCommand->setCommand($command);
@@ -120,6 +117,10 @@ abstract class DispatcherCommand extends Command {
 	 * This function is used to register commands with this dispatcher
 	 */
 	private function registerCommands() {
+		if ($this->commandsRegistered) {
+			return;
+		}
+
 		$classInfo = new ReflectionClass($this);
 		$dir = dirname($classInfo->getFileName()) . '/' . ucfirst($this->getName());
 		$namespace = $classInfo->getNamespaceName();
@@ -129,6 +130,8 @@ abstract class DispatcherCommand extends Command {
 			$class = sprintf('%s\%s\%s', $namespace, ucfirst($this->getName()), rtrim($file, '.php'));
 			$this->addCommand(new $class);
 		}
+
+		$this->commandsRegistered = true;
 	}
 
 	/**
@@ -148,9 +151,10 @@ abstract class DispatcherCommand extends Command {
 	 *
 	 * @param Symfony\Component\Console\Command\Command $command The command to be executed
 	 * @param Symfony\Component\Console\Input\InputInterface $input The command's input
+	 * @param Symfony\Component\Console\Output\OutputInterface $output The output for the command
 	 * @return int 0 or an exit status
 	 */
-	protected function beforeDispatch(SymfonyCommand $command, InputInterface $input) {}
+	protected function beforeDispatch(SymfonyCommand $command, InputInterface $input, OutputInterface $output) {}
 
 	/**
 	 * This function is called after the command has executed. This allows you to hook into the dispatcher
@@ -158,8 +162,10 @@ abstract class DispatcherCommand extends Command {
 	 * command.
 	 *
 	 * @param int $exitStatus The exit status of the dispatched command
+	 * @param Symfony\Component\Console\Input\InputInterface $input The command's input
+	 * @param Symfony\Component\Console\Output\OutputInterface $output The output for the command
 	 */
-	protected function afterDispatch() {}
+	protected function afterDispatch($exitStatus, InputInterface $input, OutputInterface $output) {}
 
 	/**
 	 * Execute the current command
@@ -173,14 +179,15 @@ abstract class DispatcherCommand extends Command {
 
 		$command = $this->getCommand($input);
 
-		if ($exitStatus = $this->beforeDispatch($command, $input)) {
+		if ($exitStatus = $this->beforeDispatch($command, $input, $output)) {
 			return $exitStatus;
 		}
 
+		$command->mergeApplicationDefinition();
 		$arrayInput = new ArgvInput($this->argv, $command->getDefinition());
 		$exitStatus = $command->run($arrayInput, $output);
 
-		$this->afterDispatch($exitStatus);
+		$this->afterDispatch($exitStatus, $input, $output);
 
 		return $exitStatus;
 	}
