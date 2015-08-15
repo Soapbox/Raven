@@ -88,9 +88,12 @@ class Raven extends Application {
 			$input = new ArgvInput();
 		}
 
-		$command = $this->get($this->getCommandName($input));
-		if ($command instanceof DispatcherCommand) {
-			$input->makeDispatcher();
+		$commandName = $this->getCommandName($input);
+		if (!empty($commandName)) {
+			$command = $this->get($commandName);
+			if ($command instanceof DispatcherCommand) {
+				$input->makeDispatcher();
+			}
 		}
 
 		return parent::run($input, $output);
