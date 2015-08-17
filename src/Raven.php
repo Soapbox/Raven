@@ -72,6 +72,7 @@ class Raven extends Application {
 		chRootDir();
 
 		$selfUpdater = new SelfUpdater($this);
+		$selfUpdater->getVersion()->setPreRelease(null);
 		$update = $selfUpdater->getUpdate();
 
 		chdir($currentDir);
