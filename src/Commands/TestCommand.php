@@ -10,6 +10,10 @@ class TestCommand extends RunCommand {
 	protected $description = 'Run the testsuites.';
 	private $vagrant;
 
+	public function isEnabled() {
+		return false;
+	}
+
 	protected function addArguments() {}
 
 	protected function addOptions() {

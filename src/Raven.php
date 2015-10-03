@@ -1,5 +1,6 @@
 <?php namespace SoapBox\Raven;
 
+use Exception;
 use KevinGH\Version\Version;
 use SoapBox\Raven\Commands;
 use SoapBox\Raven\Utils\ArgvInput;
@@ -89,12 +90,36 @@ class Raven extends Application {
 			$input = new ArgvInput();
 		}
 
-		$commandName = $this->getCommandName($input);
-		if (!empty($commandName)) {
-			$command = $this->get($commandName);
-			if ($command instanceof DispatcherCommand) {
-				$input->makeDispatcher();
+		if (null === $output) {
+			$output = new ConsoleOutput();
+		}
+
+		try {
+			$commandName = $this->getCommandName($input);
+			if (!empty($commandName)) {
+				$command = $this->find($commandName);
+				if ($command instanceof DispatcherCommand) {
+					$input->makeDispatcher();
+				}
 			}
+		} catch (Exception $e) {
+			if ($output instanceof ConsoleOutputInterface) {
+				$this->renderException($e, $output->getErrorOutput());
+			} else {
+				$this->renderException($e, $output);
+			}
+
+			$exitCode = $e->getCode();
+			if (is_numeric($exitCode)) {
+				$exitCode = (int) $exitCode;
+				if (0 === $exitCode) {
+					$exitCode = 1;
+				}
+			} else {
+				$exitCode = 1;
+			}
+
+			exit($exitCode);
 		}
 
 		return parent::run($input, $output);
@@ -116,14 +141,14 @@ class Raven extends Application {
 		return parent::doRun($input, $output);
 	}
 
-	public function add(Command $command) 
+	public function add(Command $command)
 	{
 		$this->commands[$command->getName()] = $command;
 
 		return parent::add($command);
 	}
 
-	public function get($name) 
+	public function find($name)
 	{
 		if (isset($this->commands[$name])) {
 			$command = $this->commands[$name];
@@ -133,6 +158,6 @@ class Raven extends Application {
 			}
 		}
 
-		return parent::get($name);
+		return parent::find($name);
 	}
 }
