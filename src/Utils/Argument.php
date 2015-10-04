@@ -41,9 +41,13 @@ class Argument
 		return $this->description;
 	}
 
-	public function setMode($mode)
+	public function addMode($mode)
 	{
-		$this->mode = $mode;
+		if (is_null($this->mode)) {
+			$this->mode = $mode;
+		} else {
+			$this->mode |= $mode;
+		}
 		return $this;
 	}
 
@@ -63,14 +67,17 @@ class Argument
 	}
 
 	public function optional() {
-		$this->setMode(InputArgument::OPTIONAL);
+		$this->addMode(InputArgument::OPTIONAL);
+		return $this;
 	}
 
 	public function required() {
-		$this->setMode(InputArgument::REQUIRED);
+		$this->addMode(InputArgument::REQUIRED);
+		return $this;
 	}
 
 	public function isArray() {
-		$this->setMode(InputArgument::IS_ARRAY);
+		$this->addMode(InputArgument::IS_ARRAY);
+		return $this;
 	}
 }

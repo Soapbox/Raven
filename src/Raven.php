@@ -1,19 +1,23 @@
 <?php namespace SoapBox\Raven;
 
+use Exception;
 use KevinGH\Version\Version;
 use SoapBox\Raven\Commands;
+use SoapBox\Raven\Utils\ArgvInput;
+use SoapBox\Raven\Utils\DispatcherCommand;
 use SoapBox\Raven\Utils\RavenStorage;
 use SoapBox\Raven\Utils\SelfUpdater;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Raven extends Application {
-	private $selfUpdateCommand;
+	// private $selfUpdateCommand;
 	private $storage;
+	private $commands = [];
 
 	public function __construct($name = 'Raven', $version = '@version@')
 	{
@@ -25,35 +29,22 @@ class Raven extends Application {
 
 	private function registerCommands()
 	{
-		$this->selfUpdateCommand = new Commands\SelfUpdateCommand;
-		$this->add($this->selfUpdateCommand);
+		$dir = __DIR__ . '/Commands';
+		$files = scandir($dir);
 
-		$this->add(new Commands\ClearCacheCommand);
-		$this->add(new Commands\DestroyCommand);
-		$this->add(new Commands\EditCommand);
-		$this->add(new Commands\GitConfigureCommand);
-		$this->add(new Commands\HaltCommand);
-		$this->add(new Commands\InitCommand);
-		$this->add(new Commands\MakeCommand);
-		$this->add(new Commands\ProvisionCommand);
-		$this->add(new Commands\RebuildCommand);
-		$this->add(new Commands\RefreshCommand);
-		$this->add(new Commands\ResumeCommand);
-		$this->add(new Commands\RunCommand);
-		$this->add(new Commands\SshCommand);
-		$this->add(new Commands\StatusCommand);
-		$this->add(new Commands\SuspendCommand);
-		$this->add(new Commands\WatchLogCommand);
-		$this->add(new Commands\UpCommand);
-		$this->add(new Commands\UpdateCommand);
-		$this->add(new Commands\WorkbenchCommand);
-		// $this->add(new Commands\TestCommand);
+		foreach ($files as $file) {
+			if (is_file($dir . '/' . $file)) {
+				$class = sprintf('SoapBox\Raven\Commands\%s', rtrim($file, '.php'));
+				$c = $this->add(new $class);
+			}
+		}
 	}
 
 	/**
 	 * Check to see if the current version of Raven is out of date
 	 */
-	private function isOutdated() {
+	private function isOutdated()
+	{
 		$currentVersion = new Version($this->getVersion());
 		$latestVersion = new Version($this->storage->get('latest_version'));
 		if ($latestVersion->isGreaterThan($currentVersion)) {
@@ -88,32 +79,85 @@ class Raven extends Application {
 	/**
 	 * Initialize custom styles
 	 */
-	private function initializeStyles(OutputInterface $output) {
+	private function initializeStyles(OutputInterface $output)
+	{
 		$output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
 	}
 
 	public function run(InputInterface $input = null, OutputInterface $output = null)
 	{
 		if (null === $input) {
-            $input = new ArgvInput();
-        }
+			$input = new ArgvInput();
+		}
 
-        if (null === $output) {
-            $output = new ConsoleOutput();
-        }
+		if (null === $output) {
+			$output = new ConsoleOutput();
+		}
 
-        $this->configureIO($input, $output);
-        $this->initializeStyles($output);
+		try {
+			$commandName = $this->getCommandName($input);
+			if (!empty($commandName)) {
+				$command = $this->find($commandName);
+				if ($command instanceof DispatcherCommand) {
+					$input->makeDispatcher();
+				}
+			}
+		} catch (Exception $e) {
+			if ($output instanceof ConsoleOutputInterface) {
+				$this->renderException($e, $output->getErrorOutput());
+			} else {
+				$this->renderException($e, $output);
+			}
 
-        $command = $this->getCommandName($input);
+			$exitCode = $e->getCode();
+			if (is_numeric($exitCode)) {
+				$exitCode = (int) $exitCode;
+				if (0 === $exitCode) {
+					$exitCode = 1;
+				}
+			} else {
+				$exitCode = 1;
+			}
 
-		if ($this->isOutdated() && $command != $this->selfUpdateCommand->getName()) {
-			$output->writeln(sprintf("<warning>There is a newer version of %s available. Run %s to update.</warning>\n",
-				$this->getName(),
-				$this->selfUpdateCommand->getName()
-			));
+			exit($exitCode);
 		}
 
 		return parent::run($input, $output);
+	}
+
+	public function doRun(InputInterface $input, OutputInterface $output)
+	{
+		$this->initializeStyles($output);
+
+		$command = $this->getCommandName($input);
+
+		if ($this->isOutdated() && $command != 'self-update') {
+			$output->writeln(sprintf("<warning>There is a newer version of %s available. Run %s to update.</warning>\n",
+				$this->getName(),
+				'self-update'
+			));
+		}
+
+		return parent::doRun($input, $output);
+	}
+
+	public function add(Command $command)
+	{
+		$this->commands[$command->getName()] = $command;
+
+		return parent::add($command);
+	}
+
+	public function find($name)
+	{
+		if (isset($this->commands[$name])) {
+			$command = $this->commands[$name];
+
+			if ($command instanceof DispatcherCommand) {
+				return $command;
+			}
+		}
+
+		return parent::find($name);
 	}
 }
