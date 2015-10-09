@@ -4,6 +4,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use GuzzleHttp\Client;
 use SoapBox\Raven\Utils\Command;
+use SoapBox\Raven\Utils\ProjectStorage;
 use SoapBox\Raven\Utils\RavenStorage;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Input\InputInterface;
@@ -146,6 +147,8 @@ class GenerateChangelogCommand extends Command {
 
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
+		$storage = ProjectStorage::getStorage();
+		$this->exec('git fetch --all');
 		$remoteUrl = $this->exec('git config --get remote.origin.url');
 
 		$matches = [];
