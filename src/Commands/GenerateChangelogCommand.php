@@ -1,5 +1,6 @@
 <?php namespace SoapBox\Raven\Commands;
 
+use InvalidArgumentException;
 use RuntimeException;
 use GuzzleHttp\Client;
 use SoapBox\Raven\Utils\Command;
@@ -14,7 +15,18 @@ class GenerateChangelogCommand extends Command {
 	protected $command = 'generate-changelog';
 	protected $description = 'Generate a changelog for the current repo';
 
-	protected function addArguments() {}
+	protected function addArguments() {
+		$this->makeArgument('starting_tag')
+			->setDescription('The tag to start looking for pull requests.')
+			->setDefault('')
+			->optional();
+
+		$this->makeArgument('ending_tag')
+			->setDescription('The tag to finish looking for pull requests.')
+			->setDefault('')
+			->optional();
+	}
+
 	protected function addOptions() {}
 
 	private function exec($command) {
@@ -33,7 +45,7 @@ class GenerateChangelogCommand extends Command {
 	private function getAccessToken(Client $client) {
 		$storage = RavenStorage::getStorage();
 
-		if (($accessToken = $storage->get('github_access_token')) === '') {
+		if ('' === $accessToken = $storage->get('github_access_token')) {
 			$email = $this->exec('git config --global user.email')[0];
 
 			$question = new Question(sprintf('Enter host password for user \'%s\':', $email));
@@ -65,11 +77,33 @@ class GenerateChangelogCommand extends Command {
 	private function getReleaseTags(InputInterface $input) {
 		$tags = $this->exec('git tag');
 		natsort($tags);
-		$tags = array_slice($tags, count($tags) - 2);
+		$tags = array_values($tags);
+		$recentTags = array_slice($tags, count($tags) - 2);
+
+		$startingTag = $input->getArgument('starting_tag');
+		$endingTag = $input->getArgument('ending_tag');
+
+		if (empty($startingTag)) {
+			$startingIndex = array_search($recentTags[0], $tags);
+			$startingTag = $tags[$startingIndex];
+		} else if (false === $startingIndex = array_search($startingTag, $tags)) {
+			throw new InvalidArgumentException('The starting_tag argument is not a valid tag.');
+		}
+
+		if (empty($endingTag)) {
+			$endingIndex = array_search($recentTags[1], $tags);
+			$endingTag = $tags[$endingIndex];
+		} else if (false === $endingIndex = array_search($endingTag, $tags)) {
+			throw new InvalidArgumentException('The ending_tag argument is not a valid tag.');
+		}
+
+		if ($startingIndex >= $endingIndex) {
+			throw new InvalidArgumentException('The starting_tag must be less than the ending_tag.');
+		}
 
 		return [
-			'previous' => $tags[0],
-			'latest' => $tags[1]
+			'previous' => $startingTag,
+			'latest' => $endingTag
 		];
 	}
 
