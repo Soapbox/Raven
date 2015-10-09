@@ -1,6 +1,7 @@
 <?php namespace SoapBox\Raven\Commands;
 
 use RuntimeException;
+use GuzzleHttp\Client;
 use SoapBox\Raven\Utils\Command;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,17 +52,21 @@ class GenerateChangelogCommand extends Command {
 
 		$out = [];
 
+		$client = new Client(['base_uri' => 'https://api.github.com/']);
 		$pullRequests = $this->exec($command);
 		foreach ($pullRequests as $pullRequest) {
-			$curl = curl_init(sprintf(
-				'https://api.github.com/repos/%s/%s/pulls/%s?access_token=65e85af1e06a8622374ca26a88415c96b56b945d',
+			$url = sprintf(
+				'/repos/%s/%s/pulls/%s',
 				$matches['owner'],
 				$matches['repo'],
 				$pullRequest
-			));
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($curl, CURLOPT_USERAGENT, 'raven');
-			$response = json_decode(curl_exec($curl));
+			);
+
+			$response = $client->request('GET', $url, [
+			    'query' => ['access_token' => '65e85af1e06a8622374ca26a88415c96b56b945d']
+			]);
+
+			$response = json_decode($response->getBody());
 
 			// $labels = [];
 			// if (preg_match_all('/\[([a-zA-Z]+)\]/', '[test][this][some][more]word', $labels)) {
