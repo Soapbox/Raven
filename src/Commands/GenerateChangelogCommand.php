@@ -58,25 +58,27 @@ class GenerateChangelogCommand extends Command {
 		return $output;
 	}
 
-	private function getAccessToken(Client $client) {
+	private function getAccessToken() {
 		$storage = RavenStorage::getStorage();
 
 		if ('' === $accessToken = $storage->get('github_access_token')) {
+			$client = new Client(['base_uri' => 'https://api.github.com/']);
+
 			$email = $this->exec('git config --global user.email')[0];
 
 			$question = new Question(sprintf('Enter host password for user \'%s\':', $email));
-		    $question->setHidden(true);
-		    $question->setHiddenFallback(false);
+			$question->setHidden(true);
+			$question->setHiddenFallback(false);
 
-		    $helper = $this->getHelper('question');
-		    $password = $helper->ask($input, $output, $question);
+			$helper = $this->getHelper('question');
+			$password = $helper->ask($input, $output, $question);
 
-		    $params = [
-		    	"scopes" => [
-		    		"repo"
-		    	],
-		    	"note" => "Raven"
-		    ];
+			$params = [
+				"scopes" => [
+					"repo"
+				],
+				"note" => "Raven"
+			];
 
 			$response = $client->post('/authorizations', [
 				'auth' => [$email, $password],
@@ -123,6 +125,25 @@ class GenerateChangelogCommand extends Command {
 		];
 	}
 
+	private function addPullRequest($pullRequest) {
+		$labels = [];
+		$foundSection = false;
+		if (preg_match_all('/\[([a-zA-Z]+)\]/', $pullRequest->title, $labels)) {
+			foreach ($labels[1] as $label) {
+				$label = strtolower($label);
+				if (array_key_exists($label, $this->sections)) {
+					$this->sections[$label][] = $pullRequest;
+					$foundSection = true;
+					break;
+				}
+			}
+		}
+
+		if (!$foundSection) {
+			$this->sections['misc'][] = $pullRequest;
+		}
+	}
+
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
 		$remoteUrl = $this->exec('git config --get remote.origin.url');
@@ -134,9 +155,8 @@ class GenerateChangelogCommand extends Command {
 		$repoOwner = $matches['owner'];
 		$repository = $matches['repo'];
 
-		$client = new Client(['base_uri' => 'https://api.github.com/']);
 
-		$accessToken = $this->getAccessToken($client);
+		$accessToken = $this->getAccessToken();
 
 		$tags = $this->getReleaseTags($input);
 		$command = sprintf(
@@ -144,41 +164,41 @@ class GenerateChangelogCommand extends Command {
 			$tags['previous'],
 			$tags['latest']
 		);
+		$pullRequestNumbers = $this->exec($command);
 
-		$out = [];
+		$url = sprintf(
+			'https://api.github.com/repos/%s/%s/pulls',
+			$repoOwner,
+			$repository
+		);
+		$client = new Client(['base_uri' => $url]);
 
-		$pullRequests = $this->exec($command);
-		foreach ($pullRequests as $pullRequest) {
-			$url = sprintf(
-				'/repos/%s/%s/pulls/%s',
-				$repoOwner,
-				$repository,
-				$pullRequest
-			);
+		$response = $client->request('GET', null, [
+			'query' => [
+				'access_token' => $accessToken,
+				'state' => 'closed',
+				'sort' => 'updated',
+				'direction' => 'desc',
+				'per_page' => 50
+			]
+		]);
+		$response = json_decode($response->getBody());
 
-			$response = $client->request('GET', $url, [
-			    'query' => ['access_token' => $accessToken]
+		foreach ($response as $pullRequest) {
+			if (false !== $index = array_search($pullRequest->number, $pullRequestNumbers)) {
+				$this->addPullRequest($pullRequest);
+				unset($pullRequestNumbers[$index]);
+			}
+		}
+
+		foreach ($pullRequestNumbers as $pullRequest) {
+			$path = sprintf('pulls/%s', $pullRequest);
+			$response = $client->request('GET', $path, [
+				'query' => ['access_token' => $accessToken]
 			]);
 			$response = json_decode($response->getBody());
 
-			$labels = [];
-			$foundSection = false;
-			if (preg_match_all('/\[([a-zA-Z]+)\]/', $response->title, $labels)) {
-				foreach ($labels[1] as $label) {
-					$label = strtolower($label);
-					if (array_key_exists($label, $this->sections)) {
-						$this->sections[$label][] = $response;
-						$foundSection = true;
-						break;
-					}
-				}
-			}
-
-			if (!$foundSection) {
-				$this->sections['misc'][] = $response;
-			}
-
-			$out[$pullRequest] = $response->title;
+			$this->addPullRequest($response);
 		}
 
 		$output->writeln(sprintf('<info>Changes from %s to %s</info>', $tags['previous'], $tags['latest']));
@@ -190,9 +210,14 @@ class GenerateChangelogCommand extends Command {
 			$output->writeln(sprintf('  <comment>%s</comment>', $this->sectionLabels[$section]));
 			foreach ($responses as $response) {
 				$title = trim(preg_replace('/^\[.*\]/', '', $response->title));
-				$output->writeln(sprintf('      %s', $title));
+				$output->writeln(sprintf('      %s #%s', $title, $response->number));
 			}
 			$output->writeln('');
+		}
+
+		$output->writeln('<info>The following people failed to label their PRs</info>');
+		foreach ($this->sections['misc'] as $response) {
+			$output->writeln(sprintf('  #%s - %s', $response->number, $response->user->login));
 		}
 	}
 }
