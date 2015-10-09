@@ -12,6 +12,22 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class GenerateChangelogCommand extends Command {
+	private $sections = [
+		'bugfix' => [],
+		'performance' => [],
+		'feature' => [],
+		'change' => [],
+		'misc' => []
+	];
+
+	private $sectionLabels = [
+		'bugfix' => 'Bug Fixes',
+		'performance' => 'Performance Improvements',
+		'feature' => 'New Features',
+		'change' => 'Changes',
+		'misc' => 'Other'
+	];
+
 	protected $command = 'generate-changelog';
 	protected $description = 'Generate a changelog for the current repo';
 
@@ -145,16 +161,38 @@ class GenerateChangelogCommand extends Command {
 			]);
 			$response = json_decode($response->getBody());
 
-			// $labels = [];
-			// if (preg_match_all('/\[([a-zA-Z]+)\]/', '[test][this][some][more]word', $labels)) {
-			// 	foreach ($labels as $label) {
+			$labels = [];
+			$foundSection = false;
+			if (preg_match_all('/\[([a-zA-Z]+)\]/', $response->title, $labels)) {
+				foreach ($labels[1] as $label) {
+					$label = strtolower($label);
+					if (array_key_exists($label, $this->sections)) {
+						$this->sections[$label][] = $response;
+						$foundSection = true;
+						break;
+					}
+				}
+			}
 
-			// 	}
-			// }
+			if (!$foundSection) {
+				$this->sections['misc'][] = $response;
+			}
 
 			$out[$pullRequest] = $response->title;
 		}
 
-		var_dump($out);
+		$output->writeln(sprintf('<info>Changes from %s to %s</info>', $tags['previous'], $tags['latest']));
+		foreach ($this->sections as $section => $responses) {
+			if (count($responses) === 0) {
+				continue;
+			}
+
+			$output->writeln(sprintf('  <comment>%s</comment>', $this->sectionLabels[$section]));
+			foreach ($responses as $response) {
+				$title = trim(preg_replace('/^\[.*\]/', '', $response->title));
+				$output->writeln(sprintf('      %s', $title));
+			}
+			$output->writeln('');
+		}
 	}
 }
