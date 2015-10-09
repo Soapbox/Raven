@@ -14,18 +14,10 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class GenerateChangelogCommand extends Command {
 	private $sections = [
-		'bugfix' => [],
-		'performance' => [],
-		'feature' => [],
-		'change' => [],
 		'misc' => []
 	];
 
 	private $sectionLabels = [
-		'bugfix' => 'Bug Fixes',
-		'performance' => 'Performance Improvements',
-		'feature' => 'New Features',
-		'change' => 'Changes',
 		'misc' => 'Other'
 	];
 
@@ -127,6 +119,10 @@ class GenerateChangelogCommand extends Command {
 	}
 
 	private function addPullRequest($pullRequest) {
+		if ($pullRequest->base->ref !== 'master') {
+			return;
+		}
+
 		$labels = [];
 		$foundSection = false;
 		if (preg_match_all('/\[([a-zA-Z]+)\]/', $pullRequest->title, $labels)) {
@@ -148,7 +144,16 @@ class GenerateChangelogCommand extends Command {
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
 		$storage = ProjectStorage::getStorage();
-		$this->exec('git fetch --all');
+		$sections = $storage->get('changelog.sections');
+
+		foreach ($sections as $section => $description) {
+			$this->sections[$section] = [];
+			$this->sectionLabels[$section] = $description;
+		}
+
+		$output->writeln('<info>Fetching latest tags...</info>');
+		$temp = [];
+		$this->exec('git fetch -t', $temp);
 		$remoteUrl = $this->exec('git config --get remote.origin.url');
 
 		$matches = [];
@@ -158,7 +163,7 @@ class GenerateChangelogCommand extends Command {
 		$repoOwner = $matches['owner'];
 		$repository = $matches['repo'];
 
-
+		$output->writeln('<info>Fetching pull request information...</info>');
 		$accessToken = $this->getAccessToken();
 
 		$tags = $this->getReleaseTags($input);
@@ -213,7 +218,7 @@ class GenerateChangelogCommand extends Command {
 			$output->writeln(sprintf('  <comment>%s</comment>', $this->sectionLabels[$section]));
 			foreach ($responses as $response) {
 				$title = trim(preg_replace('/^\[.*\]/', '', $response->title));
-				$output->writeln(sprintf('      %s #%s', $title, $response->number));
+				$output->writeln(sprintf('      %s #%s', $title, $response->number, $response->base->ref));
 			}
 			$output->writeln('');
 		}

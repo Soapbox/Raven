@@ -2,6 +2,7 @@
 
 use LogicException;
 use RuntimeException;
+use SoapBox\Raven\Helpers\GitHelper;
 use Symfony\Component\Process\Process;
 
 class ProjectStorage {
@@ -26,10 +27,18 @@ class ProjectStorage {
 	}
 
 	public function get($key) {
-		if ( !array_key_exists($key, $this->data) ) {
-			return '';
+		$keys = explode('.', $key);
+
+		$data = $this->data;
+		foreach ($keys as $key) {
+			if (!is_array($data) || !array_key_exists($key, $data)) {
+				return null;
+			}
+
+			$data = $data[$key];
 		}
-		return $this->data[$key];
+
+		return $data;
 	}
 
 	public function has($key) {
