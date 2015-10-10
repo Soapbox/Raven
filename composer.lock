@@ -131,12 +131,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jshayes/raven-api.git",
-                "reference": "c92276589810d0eb8961a51629c7cc38c12d8eac"
+                "reference": "78d96a86bc0eee011005f2320351fd568e54d3f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jshayes/raven-api/zipball/c92276589810d0eb8961a51629c7cc38c12d8eac",
-                "reference": "c92276589810d0eb8961a51629c7cc38c12d8eac",
+                "url": "https://api.github.com/repos/jshayes/raven-api/zipball/78d96a86bc0eee011005f2320351fd568e54d3f0",
+                "reference": "78d96a86bc0eee011005f2320351fd568e54d3f0",
                 "shasum": ""
             },
             "type": "library",
@@ -149,7 +149,7 @@
                 "source": "https://github.com/jshayes/raven-api/tree/master",
                 "issues": "https://github.com/jshayes/raven-api/issues"
             },
-            "time": "2015-10-10 09:13:45"
+            "time": "2015-10-10 10:37:51"
         },
         {
             "name": "justinrainbow/json-schema",
