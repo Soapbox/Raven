@@ -55,6 +55,16 @@ class Collection implements Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Add an item into this Collection with a given key
+	 *
+	 * @param string $key  The key for the item
+	 * @param mixed  $item The items to add
+	 */
+	public function add($key, $item) {
+		$this->items[$key] = $item;
+	}
+
+	/**
 	 * Get the number of items in this Collection
 	 *
 	 * @return int

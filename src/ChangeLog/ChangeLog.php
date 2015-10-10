@@ -45,4 +45,14 @@ class ChangeLog implements ChangeLogInterface {
 	public function addSection(Section $section) {
 		$this->sections->push($section);
 	}
+
+	/**
+	 * Add a section to this ChangeLog
+	 *
+	 * @param string  $key     The key for the Section
+	 * @param Section $section The section to add
+	 */
+	public function addSectionByKey($key, Section $section) {
+		$this->sections->add($key, $section);
+	}
 }

@@ -109,6 +109,18 @@ class GenerateChangelogCommand extends Command {
 		];
 	}
 
+	private function addToChangeLog($label, $pullRequest) {
+		$section = $this->changeLog->getSections()->get($label);
+
+		if (is_null($section)) {
+			$section = new Section($this->sectionLabels[$label]);
+			$this->changeLog->addSectionByKey($label, $section);
+		}
+
+		$entry = new SectionEntry($pullRequest);
+		$section->addEntry($entry);
+	}
+
 	private function addPullRequest($pullRequest) {
 		if ($pullRequest->getBaseBranch() !== 'master') {
 			return;
@@ -120,7 +132,7 @@ class GenerateChangelogCommand extends Command {
 			foreach ($labels[1] as $label) {
 				$label = strtolower($label);
 				if (array_key_exists($label, $this->sections)) {
-					$this->sections[$label][] = $pullRequest;
+					$this->addToChangeLog($label, $pullRequest);
 					$foundSection = true;
 					break;
 				}
@@ -128,7 +140,7 @@ class GenerateChangelogCommand extends Command {
 		}
 
 		if (!$foundSection) {
-			$this->sections['misc'][] = $pullRequest;
+			$this->addToChangeLog('misc', $pullRequest);
 		}
 	}
 
@@ -168,16 +180,15 @@ class GenerateChangelogCommand extends Command {
 		);
 		$pullRequestNumbers = $this->exec($command);
 
+		$this->changeLog = new ChangeLog();
+		$this->changeLog->setTitle(sprintf('Changes from %s to %s', $tags['previous'], $tags['latest']));
 
 		$response = $this->client->getPullRequests();
 		$response = json_decode($response->getBody());
 		$pullRequests = [];
 
-		foreach ($response as $prContent) {
-			$pullRequests[] = new PullRequest($prContent);
-		}
-
 		foreach ($pullRequests as $pullRequest) {
+			$pullRequest = new PullRequest($pullRequest);
 			if (false !== $index = array_search($pullRequest->getNumber(), $pullRequestNumbers)) {
 				$this->addPullRequest($pullRequest);
 				unset($pullRequestNumbers[$index]);
@@ -191,21 +202,9 @@ class GenerateChangelogCommand extends Command {
 			$this->addPullRequest($response);
 		}
 
-		$changeLog = new ChangeLog();
-		$changeLog->setTitle(sprintf('Changes from %s to %s', $tags['previous'], $tags['latest']));
+		$output->writeln(sprintf('<info>%s</info>', $this->changeLog->getTitle()));
 
-		foreach ($this->sections as $key => $pullRequests) {
-			$section = new Section($this->sectionLabels[$key]);
-			$changeLog->addSection($section);
-			foreach ($pullRequests as $pullRequest) {
-				$entry = new SectionEntry($pullRequest);
-				$section->addEntry($entry);
-			}
-		}
-
-		$output->writeln(sprintf('<info>%s</info>', $changeLog->getTitle()));
-
-		foreach ($changeLog->getSections() as $section) {
+		foreach ($this->changeLog->getSections() as $section) {
 			if ($section->getEntries()->isEmpty()) {
 				continue;
 			}
