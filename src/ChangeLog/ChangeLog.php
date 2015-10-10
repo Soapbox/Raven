@@ -4,6 +4,8 @@ use Raven\Api\ChangeLog\ChangeLog as ChangeLogInterface;
 
 class ChangeLog implements ChangeLogInterface
 {
+	use FormatTrait;
+
 	private $title;
 	private $sections;
 	private $previousVersion;
@@ -86,5 +88,16 @@ class ChangeLog implements ChangeLogInterface
 	public function getCurrentVersion()
 	{
 		return $this->currentVersion;
+	}
+
+	public function __toString()
+	{
+		$result = $this->formatLine(sprintf('<info>%s</info>', $this->getTitle()));
+
+		foreach ($this->getSections() as $section) {
+			$result .= $this->formatLine($section, true);
+		}
+
+		return trim($result, " \r\n");
 	}
 }

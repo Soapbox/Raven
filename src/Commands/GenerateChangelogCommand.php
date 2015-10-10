@@ -207,27 +207,11 @@ class GenerateChangelogCommand extends Command {
 			$formatter->format($this->changeLog);
 		}
 
-		$output->writeln(sprintf('<info>%s</info>', $this->changeLog->getTitle()));
-
-		foreach ($this->changeLog->getSections() as $section) {
-			if ($section->getEntries()->isEmpty()) {
-				continue;
-			}
-
-			$output->writeln(sprintf('   <comment>%s</comment>', $section->getTitle()));
-			foreach ($section->getEntries() as $entry) {
-				$output->writeln(sprintf('      %s #%s', $entry->getTitle(), $entry->getPullRequest()->getNumber()));
-
-				foreach ($entry->getSubText() as $subText) {
-					$output->writeln(sprintf('         %s', $subText));
-				}
-			}
-		}
-
+		$output->writeln((string)$this->changeLog);
 		$output->writeln('');
 
 		$output->writeln('<info>The following people failed to label their PRs</info>');
-		foreach ($this->changeLog->getSections()->get('misc') as $entry) {
+		foreach ($this->changeLog->getSections()->get('misc')->getEntries() as $entry) {
 			$pullRequest = $entry->getPullRequest();
 			$output->writeln(sprintf('   #%s - %s', $pullRequest->getNumber(), $pullRequest->getAuthor()->getLogin()));
 

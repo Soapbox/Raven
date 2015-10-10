@@ -5,6 +5,8 @@ use SoapBox\Raven\GitHub\PullRequest;
 
 class SectionEntry implements SectionEntryInterface
 {
+	use FormatTrait;
+
 	private $pullRequest;
 	private $title;
 	private $subText = [];
@@ -13,6 +15,7 @@ class SectionEntry implements SectionEntryInterface
 	{
 		$this->pullRequest = $pullRequest;
 		$title = trim(preg_replace('/^\[.*\]/', '', $pullRequest->getTitle()));
+		$title = sprintf('      %s [#%s]', $title, $pullRequest->getNumber());
 		$this->setTitle($title);
 	}
 
@@ -64,5 +67,26 @@ class SectionEntry implements SectionEntryInterface
 	public function addSubText($text)
 	{
 		$this->subText[] = $text;
+	}
+
+	/**
+	 * Set the sub text for this SectionEntity
+	 *
+	 * @param string $text The sub text to set
+	 */
+	public function setSubText($text)
+	{
+		$this->subText = $text;
+	}
+
+	public function __toString()
+	{
+		$result = $this->formatLine($this->getTitle());
+
+		foreach ($this->getSubText() as $subtext) {
+			$result .= $this->formatLine($subtext, true);
+		}
+
+		return trim($result, " \r\n");
 	}
 }
