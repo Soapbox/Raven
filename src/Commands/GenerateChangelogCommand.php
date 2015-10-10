@@ -202,6 +202,12 @@ class GenerateChangelogCommand extends Command {
 			$this->addPullRequest($response);
 		}
 
+		if ($formatterClass = $storage->get('changelog.formatter'))
+		{
+			$formatter = new $formatterClass();
+			$formatter->format($this->changeLog);
+		}
+
 		$output->writeln(sprintf('<info>%s</info>', $this->changeLog->getTitle()));
 
 		foreach ($this->changeLog->getSections() as $section) {
