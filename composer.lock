@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0bcc5827b6ef6a4990db946393131680",
+    "hash": "db8d199b008ad6fcb6aaf333c9477f6c",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -302,12 +302,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jshayes/raven-api.git",
-                "reference": "58d7d798b01aad2c25d102dc4478902a0d339ed9"
+                "reference": "b355ccd91e1ea0366eaf9b80a25b42539c880030"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jshayes/raven-api/zipball/58d7d798b01aad2c25d102dc4478902a0d339ed9",
-                "reference": "58d7d798b01aad2c25d102dc4478902a0d339ed9",
+                "url": "https://api.github.com/repos/jshayes/raven-api/zipball/b355ccd91e1ea0366eaf9b80a25b42539c880030",
+                "reference": "b355ccd91e1ea0366eaf9b80a25b42539c880030",
                 "shasum": ""
             },
             "type": "library",
@@ -320,7 +320,7 @@
                 "source": "https://github.com/jshayes/raven-api/tree/master",
                 "issues": "https://github.com/jshayes/raven-api/issues"
             },
-            "time": "2015-10-10 15:07:06"
+            "time": "2015-10-10 19:32:42"
         },
         {
             "name": "justinrainbow/json-schema",
