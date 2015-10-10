@@ -1,10 +1,11 @@
 <?php namespace SoapBox\Raven;
-
 use Exception;
+use Composer\Autoload\ClassLoader;
 use KevinGH\Version\Version;
 use SoapBox\Raven\Commands;
 use SoapBox\Raven\Utils\ArgvInput;
 use SoapBox\Raven\Utils\DispatcherCommand;
+use SoapBox\Raven\Utils\ProjectStorage;
 use SoapBox\Raven\Utils\RavenStorage;
 use SoapBox\Raven\Utils\SelfUpdater;
 use Symfony\Component\Console\Application;
@@ -19,12 +20,21 @@ class Raven extends Application {
 	private $storage;
 	private $commands = [];
 
-	public function __construct($name = 'Raven', $version = '@version@')
+	public function __construct(ClassLoader $classLoader, $name = 'Raven', $version = '@version@')
 	{
 		parent::__construct($name, $version);
 		$this->registerCommands();
 
 		$this->storage = RavenStorage::getStorage();
+
+		$projectStorage = ProjectStorage::getStorage();
+		if ($projectStorage->exists()) {
+			$plugins = $projectStorage->get('plugins');
+
+			foreach ($plugins as $namespace => $path) {
+				$classLoader->addPsr4($namespace, $path);
+			}
+		}
 	}
 
 	private function registerCommands()
