@@ -5,7 +5,7 @@ use SoapBox\Raven\Helpers\GitHelper;
 
 class ProjectStorage extends ReadableStorage
 {
-	private $root;
+	private $projectRoot = '';
 
 	protected function __construct()
 	{
@@ -26,6 +26,11 @@ class ProjectStorage extends ReadableStorage
 		}
 	}
 
+	/**
+	 * Get the rot directory of the current project
+	 *
+	 * @return string
+	 */
 	public function getProjectRoot()
 	{
 		return $this->projectRoot;
