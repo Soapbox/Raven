@@ -1,11 +1,11 @@
 <?php namespace SoapBox\Raven\ChangeLog;
 
-use Raven\Api\ChangeLog\SectionCollection as SectionCollectionInterface;
+use Raven\Api\ChangeLog\EntryCollection as EntryCollectionInterface;
 use SoapBox\Raven\Utils\Collection;
 
-class SectionCollection extends Collection implements SectionCollectionInterface {
+class EntryCollection extends Collection implements EntryCollectionInterface {
 	public function push($item) {
-		if ($item instanceof Section) {
+		if ($item instanceof Entry) {
 			parent::push($item);
 		}
 
