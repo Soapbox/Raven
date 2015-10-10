@@ -6,13 +6,14 @@ use SoapBox\Raven\GitHub\PullRequest;
 class SectionEntry implements SectionEntryInterface
 {
 	private $pullRequest;
-	private $text;
+	private $title;
+	private $subText = [];
 
 	public function __construct(PullRequest $pullRequest)
 	{
 		$this->pullRequest = $pullRequest;
 		$title = trim(preg_replace('/^\[.*\]/', '', $pullRequest->getTitle()));
-		$this->setText($title);
+		$this->setTitle($title);
 	}
 
 	/**
@@ -26,22 +27,42 @@ class SectionEntry implements SectionEntryInterface
 	}
 
 	/**
-	 * Get the text for this SectionEntry
+	 * Get the title for this SectionEntry
 	 *
 	 * @return string
 	 */
-	public function getText()
+	public function getTitle()
 	{
-		return $this->text;
+		return $this->title;
 	}
 
 	/**
-	 * Set the text for this SectionEntry
+	 * Set the title for this SectionEntry
 	 *
-	 * @param string $text The text to set for this SectionEntry
+	 * @param string $title The title to set for this SectionEntry
 	 */
-	public function setText($text)
+	public function setTitle($title)
 	{
-		$this->text = $text;
+		$this->title = $title;
+	}
+
+	/**
+	 * Get the sub text for this SectionEntity
+	 *
+	 * @return array
+	 */
+	public function getSubText()
+	{
+		return $this->subText;
+	}
+
+	/**
+	 * Add sub text to this SectionEntity
+	 *
+	 * @param string $text The sub text to add
+	 */
+	public function addSubText($text)
+	{
+		$this->subText[] = $text;
 	}
 }
