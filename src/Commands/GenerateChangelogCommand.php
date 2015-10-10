@@ -5,6 +5,7 @@ use RuntimeException;
 use SoapBox\Raven\ChangeLog\ChangeLog;
 use SoapBox\Raven\ChangeLog\Section;
 use SoapBox\Raven\ChangeLog\SectionEntry;
+use SoapBox\Raven\ChangeLog\Validator;
 use SoapBox\Raven\GitHub\Client;
 use SoapBox\Raven\GitHub\PullRequest;
 use SoapBox\Raven\Utils\Command;
@@ -24,6 +25,9 @@ class GenerateChangelogCommand extends Command {
 	private $sectionLabels = [
 		'misc' => 'Other'
 	];
+
+	private $validators = [];
+	private $invalidEntries = [];
 
 	protected $command = 'generate-changelog';
 	protected $description = 'Generate a changelog for the current repo';
@@ -119,6 +123,15 @@ class GenerateChangelogCommand extends Command {
 
 		$entry = new SectionEntry($pullRequest);
 		$section->addEntry($entry);
+
+		$valid = true;
+		foreach ($this->validators as $validator) {
+			$valid = $valid && $validator->isValid($entry);
+		}
+
+		if (!$valid) {
+			$this->invalidEntries[] = $entry;
+		}
 	}
 
 	private function addPullRequest($pullRequest) {
@@ -156,6 +169,13 @@ class GenerateChangelogCommand extends Command {
 			}
 		}
 
+		$this->validators[] = new Validator($this->sections);
+		if ($validators = $storage->get('changelog.validators')) {
+			foreach ($validators as $validator) {
+				$this->validators[] = new $validator();
+			}
+		}
+
 		$output->writeln('<info>Fetching latest tags...</info>');
 		$temp = [];
 		$this->exec('git fetch -t', $temp);
@@ -183,12 +203,11 @@ class GenerateChangelogCommand extends Command {
 		$this->changeLog = new ChangeLog($tags['previous'], $tags['latest']);
 
 		$response = $this->client->getPullRequests();
-		$response = json_decode($response->getBody());
-		$pullRequests = [];
+		$pullRequests = json_decode($response->getBody());
 
 		foreach ($pullRequests as $pullRequest) {
-			$pullRequest = new PullRequest($pullRequest);
-			if (false !== $index = array_search($pullRequest->getNumber(), $pullRequestNumbers)) {
+			if (false !== $index = array_search($pullRequest->number, $pullRequestNumbers)) {
+				$pullRequest = new PullRequest($pullRequest);
 				$this->addPullRequest($pullRequest);
 				unset($pullRequestNumbers[$index]);
 			}
@@ -207,16 +226,16 @@ class GenerateChangelogCommand extends Command {
 			$formatter->format($this->changeLog);
 		}
 
-		$output->writeln((string)$this->changeLog);
 		$output->writeln('');
+		$output->writeln((string)$this->changeLog);
 
-		$output->writeln('<info>The following people failed to label their PRs</info>');
-		foreach ($this->changeLog->getSections()->get('misc')->getEntries() as $entry) {
-			$pullRequest = $entry->getPullRequest();
-			$output->writeln(sprintf('   #%s - %s', $pullRequest->getNumber(), $pullRequest->getAuthor()->getLogin()));
+		if (!empty($this->invalidEntries)) {
+			$output->writeln('');
 
-			foreach ($entry->getSubText() as $subText) {
-				$output->writeln(sprintf('   %s', $subText));
+			$output->writeln('<info>The following people failed to label their PRs</info>');
+			foreach ($this->invalidEntries as $entry) {
+				$pullRequest = $entry->getPullRequest();
+				$output->writeln(sprintf('   #%s - %s', $pullRequest->getNumber(), $pullRequest->getAuthor()->getLogin()));
 			}
 		}
 	}
