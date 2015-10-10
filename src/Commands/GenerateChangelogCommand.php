@@ -3,6 +3,7 @@
 use InvalidArgumentException;
 use RuntimeException;
 use GuzzleHttp\Client;
+use SoapBox\Raven\ChangeLog\ChangeLog;
 use SoapBox\Raven\GitHub\PullRequest;
 use SoapBox\Raven\Utils\Command;
 use SoapBox\Raven\Utils\ProjectStorage;
@@ -214,6 +215,8 @@ class GenerateChangelogCommand extends Command {
 
 			$this->addPullRequest($response);
 		}
+
+		$changeLog = new ChangeLog();
 
 		$output->writeln(sprintf('<info>Changes from %s to %s</info>', $tags['previous'], $tags['latest']));
 		foreach ($this->sections as $section => $pullRequests) {
