@@ -1,4 +1,4 @@
-<?php namespace SoapBox\Racen\Utils;
+<?php namespace SoapBox\Raven\Utils;
 
 use ArrayIterator;
 use Countable;
@@ -45,6 +45,16 @@ class Collection implements Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Push an item into this Collection
+	 *
+	 * @param mixed $item The item to add to this Collection
+	 */
+	public function push($item)
+	{
+		$this->items[] = $item;
+	}
+
+	/**
 	 * Get the number of items in this Collection
 	 *
 	 * @return int
@@ -55,6 +65,16 @@ class Collection implements Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Determine if the collection is empty
+	 *
+	 * @return bool
+	 */
+	public function isEmpty()
+	{
+		return $this->count() == 0;
+	}
+
+	/**
 	 * Get the iterator for this Collection
 	 *
 	 * @return ArrayIterator
@@ -62,15 +82,5 @@ class Collection implements Countable, IteratorAggregate {
 	public function getIterator()
 	{
 		return new ArrayIterator($this->items);
-	}
-
-	/**
-	 * Push an item into this Collection
-	 *
-	 * @param mixed $item The item to add to this Collection
-	 */
-	public function push($item)
-	{
-		$this->items[] = $item;
 	}
 }

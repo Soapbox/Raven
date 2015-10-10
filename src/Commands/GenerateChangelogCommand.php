@@ -4,6 +4,8 @@ use InvalidArgumentException;
 use RuntimeException;
 use GuzzleHttp\Client;
 use SoapBox\Raven\ChangeLog\ChangeLog;
+use SoapBox\Raven\ChangeLog\Section;
+use SoapBox\Raven\ChangeLog\SectionEntry;
 use SoapBox\Raven\GitHub\PullRequest;
 use SoapBox\Raven\Utils\Command;
 use SoapBox\Raven\Utils\ProjectStorage;
@@ -217,20 +219,31 @@ class GenerateChangelogCommand extends Command {
 		}
 
 		$changeLog = new ChangeLog();
+		$changeLog->setTitle(sprintf('Changes from %s to %s', $tags['previous'], $tags['latest']));
 
-		$output->writeln(sprintf('<info>Changes from %s to %s</info>', $tags['previous'], $tags['latest']));
-		foreach ($this->sections as $section => $pullRequests) {
-			if (count($pullRequests) === 0) {
+		foreach ($this->sections as $key => $pullRequests) {
+			$section = new Section($this->sectionLabels[$key]);
+			$changeLog->addSection($section);
+			foreach ($pullRequests as $pullRequest) {
+				$entry = new SectionEntry($pullRequest);
+				$section->addEntry($entry);
+			}
+		}
+
+		$output->writeln(sprintf('<info>%s</info>', $changeLog->getTitle()));
+
+		foreach ($changeLog->getSections() as $section) {
+			if ($section->getEntries()->isEmpty()) {
 				continue;
 			}
 
-			$output->writeln(sprintf('  <comment>%s</comment>', $this->sectionLabels[$section]));
-			foreach ($pullRequests as $pullRequest) {
-				$title = trim(preg_replace('/^\[.*\]/', '', $pullRequest->getTitle()));
-				$output->writeln(sprintf('      %s #%s', $title, $pullRequest->getNumber()));
+			$output->writeln(sprintf('  <comment>%s</comment>', $section->getTitle()));
+			foreach ($section->getEntries() as $entry) {
+				$output->writeln(sprintf('      %s #%s', $entry->getText(), $entry->getPullRequest()->getNumber()));
 			}
-			$output->writeln('');
 		}
+
+		$this->writeln('');
 
 		$output->writeln('<info>The following people failed to label their PRs</info>');
 		foreach ($this->sections['misc'] as $pullRequest) {

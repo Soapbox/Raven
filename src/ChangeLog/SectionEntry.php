@@ -1,9 +1,9 @@
 <?php namespace SoapBox\Raven\ChangeLog;
 
-use Raven\Api\ChangeLog\SectionEntry\ SectionEntryInterface;
+use Raven\Api\ChangeLog\SectionEntry as SectionEntryInterface;
 use SoapBox\Raven\GitHub\PullRequest;
 
-class SectionEntry extends SectionEntryInterface
+class SectionEntry implements SectionEntryInterface
 {
 	private $pullRequest;
 	private $text;
@@ -11,7 +11,8 @@ class SectionEntry extends SectionEntryInterface
 	public function __construct(PullRequest $pullRequest)
 	{
 		$this->pullRequest = $pullRequest;
-		$this->setText($pullRequest->getTitle());
+		$title = trim(preg_replace('/^\[.*\]/', '', $pullRequest->getTitle()));
+		$this->setText($title);
 	}
 
 	/**
