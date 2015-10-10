@@ -10,6 +10,11 @@ abstract class ReadableStorage
 
 	protected function __construct() {}
 
+	/**
+	 * Load the file's data
+	 *
+	 * @param string $filePath The file to load
+	 */
 	protected function loadFile($filePath)
 	{
 		$this->dataFile = $filePath;
@@ -20,6 +25,13 @@ abstract class ReadableStorage
 		}
 	}
 
+	/**
+	 * Get an element from the stoarage
+	 *
+	 * @param string $key     The key for which to search the storage
+	 * @param mized  $default The deafault value for when the key is not found
+	 * @return mixed
+	 */
 	public function get($key, $default = null)
 	{
 		$keys = explode('.', $key);
@@ -36,16 +48,32 @@ abstract class ReadableStorage
 		return $data;
 	}
 
+	/**
+	 * Check to see if the storage contains a value
+	 *
+	 * @param string $key The key to check
+	 * @return bool
+	 */
 	public function has($key)
 	{
 		return !is_null($this->get($key));
 	}
 
+	/**
+	 * Get whether or not the storage file exists
+	 *
+	 * @return bool
+	 */
 	public function exists()
 	{
 		return $this->fileLoaded;
 	}
 
+	/**
+	 * Get the singleton instance of the storage
+	 *
+	 * @return ReadableStorage
+	 */
 	public static function getStorage()
 	{
 		if (is_null(self::$instance)) {
