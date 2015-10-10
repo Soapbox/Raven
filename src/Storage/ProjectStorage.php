@@ -5,6 +5,8 @@ use SoapBox\Raven\Helpers\GitHelper;
 
 class ProjectStorage extends ReadableStorage
 {
+	private $root;
+
 	protected function __construct()
 	{
 		$root = getcwd();
@@ -18,5 +20,14 @@ class ProjectStorage extends ReadableStorage
 		}
 
 		$this->loadFile($file);
+
+		if ($this->exists()) {
+			$this->projectRoot = $root;
+		}
+	}
+
+	public function getProjectRoot()
+	{
+		return $this->projectRoot;
 	}
 }
