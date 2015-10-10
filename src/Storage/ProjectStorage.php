@@ -5,7 +5,7 @@ use SoapBox\Raven\Helpers\GitHelper;
 
 class ProjectStorage extends ReadableStorage
 {
-	private function __construct()
+	protected function __construct()
 	{
 		$root = getcwd();
 		$file = $root . '/raven.json';
