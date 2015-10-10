@@ -2,10 +2,10 @@
 
 use InvalidArgumentException;
 use RuntimeException;
-use GuzzleHttp\Client;
 use SoapBox\Raven\ChangeLog\ChangeLog;
 use SoapBox\Raven\ChangeLog\Section;
 use SoapBox\Raven\ChangeLog\SectionEntry;
+use SoapBox\Raven\GitHub\Client;
 use SoapBox\Raven\GitHub\PullRequest;
 use SoapBox\Raven\Utils\Command;
 use SoapBox\Raven\Utils\ProjectStorage;
@@ -59,8 +59,6 @@ class GenerateChangelogCommand extends Command {
 		$storage = RavenStorage::getStorage();
 
 		if ('' === $accessToken = $storage->get('github_access_token')) {
-			$client = new Client(['base_uri' => 'https://api.github.com/']);
-
 			$email = $this->exec('git config --global user.email')[0];
 
 			$question = new Question(sprintf('Enter host password for user \'%s\':', $email));
@@ -70,22 +68,11 @@ class GenerateChangelogCommand extends Command {
 			$helper = $this->getHelper('question');
 			$password = $helper->ask($input, $output, $question);
 
-			$params = [
-				"scopes" => [
-					"repo"
-				],
-				"note" => "Raven"
-			];
-
-			$response = $client->post('/authorizations', [
-				'auth' => [$email, $password],
-				'body' => json_encode($params)
-			]);
-
-			$accessToken = json_decode($response->getBody())->token;
+			$accessToken = $this->client->acquireAccessToken($email, $password);
 			$storage->set('github_access_token', $accessToken);
 		}
 
+		$this->client->setAccessToken($accessToken);
 		return $accessToken;
 	}
 
@@ -147,6 +134,8 @@ class GenerateChangelogCommand extends Command {
 
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
+		$this->client = new Client();
+
 		$storage = ProjectStorage::getStorage();
 		$sections = $storage->get('changelog.sections');
 
@@ -166,6 +155,7 @@ class GenerateChangelogCommand extends Command {
 		}
 		$repoOwner = $matches['owner'];
 		$repository = $matches['repo'];
+		$this->client->setRepository($repoOwner, $repository);
 
 		$output->writeln('<info>Fetching pull request information...</info>');
 		$accessToken = $this->getAccessToken();
@@ -178,22 +168,8 @@ class GenerateChangelogCommand extends Command {
 		);
 		$pullRequestNumbers = $this->exec($command);
 
-		$url = sprintf(
-			'https://api.github.com/repos/%s/%s/pulls',
-			$repoOwner,
-			$repository
-		);
-		$client = new Client(['base_uri' => $url]);
 
-		$response = $client->request('GET', null, [
-			'query' => [
-				'access_token' => $accessToken,
-				'state' => 'closed',
-				'sort' => 'updated',
-				'direction' => 'desc',
-				'per_page' => 50
-			]
-		]);
+		$response = $this->client->getPullRequests();
 		$response = json_decode($response->getBody());
 		$pullRequests = [];
 
@@ -209,10 +185,7 @@ class GenerateChangelogCommand extends Command {
 		}
 
 		foreach ($pullRequestNumbers as $pullRequest) {
-			$path = sprintf('pulls/%s', $pullRequest);
-			$response = $client->request('GET', $path, [
-				'query' => ['access_token' => $accessToken]
-			]);
+			$response = $this->client->getPullRequest($pullRequest);
 			$response = new PullRequest(json_decode($response->getBody()));
 
 			$this->addPullRequest($response);
@@ -243,7 +216,7 @@ class GenerateChangelogCommand extends Command {
 			}
 		}
 
-		$this->writeln('');
+		$output->writeln('');
 
 		$output->writeln('<info>The following people failed to label their PRs</info>');
 		foreach ($this->sections['misc'] as $pullRequest) {
