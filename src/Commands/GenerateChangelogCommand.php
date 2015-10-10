@@ -58,7 +58,7 @@ class GenerateChangelogCommand extends Command {
 	private function getAccessToken() {
 		$storage = RavenStorage::getStorage();
 
-		if ('' === $accessToken = $storage->get('github_access_token')) {
+		if ($accessToken = $storage->get('github_access_token')) {
 			$email = $this->exec('git config --global user.email')[0];
 
 			$question = new Question(sprintf('Enter host password for user \'%s\':', $email));
@@ -149,11 +149,11 @@ class GenerateChangelogCommand extends Command {
 		$this->client = new Client();
 
 		$storage = ProjectStorage::getStorage();
-		$sections = $storage->get('changelog.sections');
-
-		foreach ($sections as $section => $description) {
-			$this->sections[$section] = [];
-			$this->sectionLabels[$section] = $description;
+		if ($sections = $storage->get('changelog.sections')) {
+			foreach ($sections as $section => $description) {
+				$this->sections[$section] = [];
+				$this->sectionLabels[$section] = $description;
+			}
 		}
 
 		$output->writeln('<info>Fetching latest tags...</info>');
