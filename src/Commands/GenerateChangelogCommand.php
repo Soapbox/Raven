@@ -215,17 +215,26 @@ class GenerateChangelogCommand extends Command {
 				continue;
 			}
 
-			$output->writeln(sprintf('  <comment>%s</comment>', $section->getTitle()));
+			$output->writeln(sprintf('   <comment>%s</comment>', $section->getTitle()));
 			foreach ($section->getEntries() as $entry) {
-				$output->writeln(sprintf('      %s #%s', $entry->getText(), $entry->getPullRequest()->getNumber()));
+				$output->writeln(sprintf('      %s #%s', $entry->getTitle(), $entry->getPullRequest()->getNumber()));
+
+				foreach ($entry->getSubText() as $subText) {
+					$output->writeln(sprintf('         %s', $subText));
+				}
 			}
 		}
 
 		$output->writeln('');
 
 		$output->writeln('<info>The following people failed to label their PRs</info>');
-		foreach ($this->sections['misc'] as $pullRequest) {
-			$output->writeln(sprintf('  #%s - %s', $pullRequest->getNumber(), $pullRequest->getAuthor()->getLogin()));
+		foreach ($this->changeLog->getSections()->get('misc') as $entry) {
+			$pullRequest = $entry->getPullRequest();
+			$output->writeln(sprintf('   #%s - %s', $pullRequest->getNumber(), $pullRequest->getAuthor()->getLogin()));
+
+			foreach ($entry->getSubText() as $subText) {
+				$output->writeln(sprintf('   %s', $subText));
+			}
 		}
 	}
 }
