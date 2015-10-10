@@ -16,7 +16,6 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Raven extends Application {
-	// private $selfUpdateCommand;
 	private $storage;
 	private $commands = [];
 
@@ -32,7 +31,7 @@ class Raven extends Application {
 			$plugins = $projectStorage->get('plugins');
 
 			foreach ($plugins as $namespace => $path) {
-				$classLoader->addPsr4($namespace, $path);
+				$classLoader->addPsr4($namespace, sprintf('%s/%s', getcwd(), $path));
 			}
 		}
 	}
