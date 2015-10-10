@@ -28,10 +28,8 @@ class Raven extends Application {
 
 		$projectStorage = ProjectStorage::getStorage();
 		if ($projectStorage->exists()) {
-			if ($plugins = $projectStorage->get('plugins')) {
-				foreach ($plugins as $namespace => $path) {
-					$classLoader->addPsr4($namespace, sprintf('%s/%s', getcwd(), $path));
-				}
+			foreach ($projectStorage->get('plugins', []) as $namespace => $path) {
+				$classLoader->addPsr4($namespace, sprintf('%s/%s', getcwd(), $path));
 			}
 		}
 	}

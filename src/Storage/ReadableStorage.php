@@ -20,14 +20,14 @@ abstract class ReadableStorage
 		}
 	}
 
-	public function get($key)
+	public function get($key, $default = null)
 	{
 		$keys = explode('.', $key);
 
 		$data = $this->data;
 		foreach ($keys as $key) {
 			if (!is_array($data) || !array_key_exists($key, $data)) {
-				return null;
+				return $default;
 			}
 
 			$data = $data[$key];
