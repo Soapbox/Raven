@@ -48,6 +48,10 @@ class GenerateChangelogCommand extends Command {
 		$this->makeOption('batch')
 			->setDescription('Run this command in batch mode.')
 			->boolean();
+
+		$this->makeOption('ignore-pre')
+			->setDescription('Ignore pre-releases')
+			->boolean();
 	}
 
 	private function exec($command) {
@@ -85,7 +89,13 @@ class GenerateChangelogCommand extends Command {
 	}
 
 	private function getReleaseTags(InputInterface $input) {
-		$tags = $this->exec('git tag');
+		$command = 'git tag';
+
+		if ($input->getOption('ignore-pre')) {
+			$command .= ' | grep -v \'-\'';
+		}
+
+		$tags = $this->exec($command);
 		natsort($tags);
 		$tags = array_values($tags);
 		$recentTags = array_slice($tags, count($tags) - 2);
