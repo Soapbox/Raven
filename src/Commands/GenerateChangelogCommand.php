@@ -3,6 +3,7 @@
 use InvalidArgumentException;
 use RuntimeException;
 use GuzzleHttp\Client;
+use SoapBox\Raven\GitHub\PullRequest;
 use SoapBox\Raven\Utils\Command;
 use SoapBox\Raven\Utils\ProjectStorage;
 use SoapBox\Raven\Utils\RavenStorage;
@@ -119,13 +120,13 @@ class GenerateChangelogCommand extends Command {
 	}
 
 	private function addPullRequest($pullRequest) {
-		if ($pullRequest->base->ref !== 'master') {
+		if ($pullRequest->getBaseBranch() !== 'master') {
 			return;
 		}
 
 		$labels = [];
 		$foundSection = false;
-		if (preg_match_all('/\[([a-zA-Z]+)\]/', $pullRequest->title, $labels)) {
+		if (preg_match_all('/\[([a-zA-Z]+)\]/', $pullRequest->getTitle(), $labels)) {
 			foreach ($labels[1] as $label) {
 				$label = strtolower($label);
 				if (array_key_exists($label, $this->sections)) {
@@ -191,9 +192,14 @@ class GenerateChangelogCommand extends Command {
 			]
 		]);
 		$response = json_decode($response->getBody());
+		$pullRequests = [];
 
-		foreach ($response as $pullRequest) {
-			if (false !== $index = array_search($pullRequest->number, $pullRequestNumbers)) {
+		foreach ($response as $prContent) {
+			$pullRequests[] = new PullRequest($prContent);
+		}
+
+		foreach ($pullRequests as $pullRequest) {
+			if (false !== $index = array_search($pullRequest->getNumber(), $pullRequestNumbers)) {
 				$this->addPullRequest($pullRequest);
 				unset($pullRequestNumbers[$index]);
 			}
@@ -204,28 +210,28 @@ class GenerateChangelogCommand extends Command {
 			$response = $client->request('GET', $path, [
 				'query' => ['access_token' => $accessToken]
 			]);
-			$response = json_decode($response->getBody());
+			$response = new PullRequest(json_decode($response->getBody()));
 
 			$this->addPullRequest($response);
 		}
 
 		$output->writeln(sprintf('<info>Changes from %s to %s</info>', $tags['previous'], $tags['latest']));
-		foreach ($this->sections as $section => $responses) {
-			if (count($responses) === 0) {
+		foreach ($this->sections as $section => $pullRequests) {
+			if (count($pullRequests) === 0) {
 				continue;
 			}
 
 			$output->writeln(sprintf('  <comment>%s</comment>', $this->sectionLabels[$section]));
-			foreach ($responses as $response) {
-				$title = trim(preg_replace('/^\[.*\]/', '', $response->title));
-				$output->writeln(sprintf('      %s #%s', $title, $response->number, $response->base->ref));
+			foreach ($pullRequests as $pullRequest) {
+				$title = trim(preg_replace('/^\[.*\]/', '', $pullRequest->getTitle()));
+				$output->writeln(sprintf('      %s #%s', $title, $pullRequest->getNumber()));
 			}
 			$output->writeln('');
 		}
 
 		$output->writeln('<info>The following people failed to label their PRs</info>');
-		foreach ($this->sections['misc'] as $response) {
-			$output->writeln(sprintf('  #%s - %s', $response->number, $response->user->login));
+		foreach ($this->sections['misc'] as $pullRequest) {
+			$output->writeln(sprintf('  #%s - %s', $pullRequest->getNumber(), $pullRequest->getAuthor()->getLogin()));
 		}
 	}
 }
