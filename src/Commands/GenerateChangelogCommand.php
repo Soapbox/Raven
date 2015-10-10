@@ -44,7 +44,11 @@ class GenerateChangelogCommand extends Command {
 			->optional();
 	}
 
-	protected function addOptions() {}
+	protected function addOptions() {
+		$this->makeOption('batch')
+			->setDescription('Run this command in batch mode.')
+			->boolean();
+	}
 
 	private function exec($command) {
 		$output = [];
@@ -160,6 +164,7 @@ class GenerateChangelogCommand extends Command {
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
 		$this->client = new Client();
+		$batchMode = $input->getOption('batch');
 
 		$storage = ProjectStorage::getStorage();
 		if ($sections = $storage->get('changelog.sections')) {
@@ -176,7 +181,10 @@ class GenerateChangelogCommand extends Command {
 			}
 		}
 
-		$output->writeln('<info>Fetching latest tags...</info>');
+		if (!$batchMode) {
+			$output->writeln('<info>Fetching latest tags...</info>');
+		}
+
 		$temp = [];
 		$this->exec('git fetch -t', $temp);
 		$remoteUrl = $this->exec('git config --get remote.origin.url');
@@ -189,7 +197,10 @@ class GenerateChangelogCommand extends Command {
 		$repository = $matches['repo'];
 		$this->client->setRepository($repoOwner, $repository);
 
-		$output->writeln('<info>Fetching pull request information...</info>');
+		if (!$batchMode) {
+			$output->writeln('<info>Fetching pull request information...</info>');
+		}
+
 		$accessToken = $this->getAccessToken();
 
 		$tags = $this->getReleaseTags($input);
@@ -226,8 +237,15 @@ class GenerateChangelogCommand extends Command {
 			$formatter->format($this->changeLog);
 		}
 
-		$output->writeln('');
+		if (!$batchMode) {
+			$output->writeln('');
+		}
+
 		$output->writeln((string)$this->changeLog);
+
+		if ($batchMode) {
+			return;
+		}
 
 		if (!empty($this->invalidEntries)) {
 			$output->writeln('');
