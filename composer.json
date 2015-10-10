@@ -1,11 +1,18 @@
 {
     "name": "soapbox/soapbox-vagrant",
     "description": "A virtual machine for SoapBoxers.",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:jshayes/raven-api.git"
+        }
+    ],
     "require": {
         "php": ">=5.4",
         "symfony/console": "~2.0",
         "symfony/process": "~2.0",
-        "herrera-io/phar-update": "1.*"
+        "herrera-io/phar-update": "1.*",
+        "jshayes/raven-api": "dev-master"
     },
     "authors": [
         {

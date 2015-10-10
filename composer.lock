@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4ec5dc4b4d4b22303168f91f3261b7fc",
+    "hash": "0bcc5827b6ef6a4990db946393131680",
     "packages": [
         {
             "name": "herrera-io/json",
@@ -124,6 +124,32 @@
                 "update"
             ],
             "time": "2013-10-30 17:23:01"
+        },
+        {
+            "name": "jshayes/raven-api",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jshayes/raven-api.git",
+                "reference": "87ad9c66890f43220e5f2ec097d3fc43d74f673c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jshayes/raven-api/zipball/87ad9c66890f43220e5f2ec097d3fc43d74f673c",
+                "reference": "87ad9c66890f43220e5f2ec097d3fc43d74f673c",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Raven\\Api\\": "src/Raven/Api"
+                }
+            },
+            "support": {
+                "source": "https://github.com/jshayes/raven-api/tree/master",
+                "issues": "https://github.com/jshayes/raven-api/issues"
+            },
+            "time": "2015-10-10 08:40:47"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -390,7 +416,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "jshayes/raven-api": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
