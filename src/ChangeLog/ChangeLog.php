@@ -2,11 +2,18 @@
 
 use Raven\Api\ChangeLog\ChangeLog as ChangeLogInterface;
 
-class ChangeLog implements ChangeLogInterface {
+class ChangeLog implements ChangeLogInterface
+{
 	private $title;
 	private $sections;
+	private $previousVersion;
+	private $currentVersion;
 
-	public function __construct() {
+	public function __construct($previousVersion, $currentVersion)
+	{
+		$this->previousVersion = $previousVersion;
+		$this->currentVersion = $currentVersion;
+		$this->setTitle(sprintf('Changes from %s to %s', $previousVersion, $currentVersion));
 		$this->sections = new SectionCollection();
 	}
 
@@ -15,7 +22,8 @@ class ChangeLog implements ChangeLogInterface {
 	 *
 	 * @return string
 	 */
-	public function getTitle() {
+	public function getTitle()
+	{
 		return $this->title;
 	}
 
@@ -24,7 +32,8 @@ class ChangeLog implements ChangeLogInterface {
 	 *
 	 * @param string $title The title text to set
 	 */
-	public function setTitle($title) {
+	public function setTitle($title)
+	{
 		$this->title = $title;
 	}
 
@@ -33,7 +42,8 @@ class ChangeLog implements ChangeLogInterface {
 	 *
 	 * @return Raven\Api\ChangeLog\SectionCollection
 	 */
-	public function getSections() {
+	public function getSections()
+	{
 		return $this->sections;
 	}
 
@@ -42,7 +52,8 @@ class ChangeLog implements ChangeLogInterface {
 	 *
 	 * @param Section $section The section to add
 	 */
-	public function addSection(Section $section) {
+	public function addSection(Section $section)
+	{
 		$this->sections->push($section);
 	}
 
@@ -52,7 +63,28 @@ class ChangeLog implements ChangeLogInterface {
 	 * @param string  $key     The key for the Section
 	 * @param Section $section The section to add
 	 */
-	public function addSectionByKey($key, Section $section) {
+	public function addSectionByKey($key, Section $section)
+	{
 		$this->sections->add($key, $section);
+	}
+
+	/**
+	 * Get the version from which this change log is generated
+	 *
+	 * @return string
+	 */
+	public function getPreviousVersion()
+	{
+		return $this->previousVersion;
+	}
+
+	/**
+	 * Get the version to which change log is generated
+	 *
+	 * @return string
+	 */
+	public function getCurrentVersion()
+	{
+		return $this->currentVersion;
 	}
 }

@@ -180,8 +180,7 @@ class GenerateChangelogCommand extends Command {
 		);
 		$pullRequestNumbers = $this->exec($command);
 
-		$this->changeLog = new ChangeLog();
-		$this->changeLog->setTitle(sprintf('Changes from %s to %s', $tags['previous'], $tags['latest']));
+		$this->changeLog = new ChangeLog($tags['previous'], $tags['latest']);
 
 		$response = $this->client->getPullRequests();
 		$response = json_decode($response->getBody());
