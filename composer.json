@@ -12,7 +12,8 @@
         "symfony/console": "~2.0",
         "symfony/process": "~2.0",
         "herrera-io/phar-update": "1.*",
-        "jshayes/raven-api": "dev-master"
+        "jshayes/raven-api": "dev-master",
+        "guzzlehttp/guzzle": "~6.0"
     },
     "authors": [
         {

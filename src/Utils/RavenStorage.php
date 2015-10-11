@@ -31,6 +31,10 @@ class RavenStorage {
 		$this->save();
 	}
 
+	public function has($key) {
+		return array_key_exists($key, $this->data);
+	}
+
 	public static function getStorage() {
 		if (is_null(self::$instance)) {
 			self::$instance = new RavenStorage();
