@@ -2,8 +2,6 @@
 
 abstract class ReadableStorage
 {
-	private static $instance;
-
 	private $fileLoaded = false;
 	protected $data = [];
 	protected $dataFile;
@@ -76,9 +74,9 @@ abstract class ReadableStorage
 	 */
 	public static function getStorage()
 	{
-		if (is_null(self::$instance)) {
-			self::$instance = new static();
+		if (is_null(static::$instance)) {
+			static::$instance = new static();
 		}
-		return self::$instance;
+		return static::$instance;
 	}
 }
