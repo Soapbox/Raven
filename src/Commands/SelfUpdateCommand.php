@@ -58,6 +58,21 @@ class SelfUpdateCommand extends Command
 				$update->getVersion()
 			));
 
+			$commandInput = new ArrayInput([
+				'--batch' => true,
+				'starting_tag' => $this->getApplication()->getVersion(),
+				'ending_tag' => $update->getVersion()
+			]);
+
+			$currentDir = getcwd();
+			$changeLogCommand = $this->getApplication()->find('generate-changelog');
+			try {
+				chRootDir();
+				$changeLogCommand->run($commandInput, $output);
+			} catch (Exception $e) {}
+
+
+			chdir($currentDir);
 			$selfUpdater->update($major, $pre);
 
 			$output->writeln(sprintf(
@@ -65,16 +80,6 @@ class SelfUpdateCommand extends Command
 				$this->getApplication()->getName(),
 				$update->getVersion()
 			));
-
-			$changeLogCommand = $this->getApplication()->find('generate-changelog');
-			$commandInput = new ArrayInput([
-				'--batch' => true,
-				'starting_tag' => $this->getApplication()->getVersion(),
-				'ending_tag' => $update->getVersion()
-			]);
-			try {
-				$changeLogCommand->run($commandInput, $output);
-			} catch (Exception $e) {}
 		}
 	}
 }
