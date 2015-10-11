@@ -5,6 +5,8 @@ use SoapBox\Raven\Helpers\GitHelper;
 
 class ProjectStorage extends ReadableStorage
 {
+	protected static $instance;
+
 	private $projectRoot = '';
 
 	protected function __construct()
