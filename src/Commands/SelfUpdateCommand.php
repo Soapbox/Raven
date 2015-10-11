@@ -1,9 +1,11 @@
 <?php namespace SoapBox\Raven\Commands;
 
+use Exception;
 use Herrera\Phar\Update\Manager;
 use Herrera\Phar\Update\Manifest;
 use SoapBox\Raven\Utils\Command;
 use SoapBox\Raven\Utils\SelfUpdater;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
@@ -37,7 +39,7 @@ class SelfUpdateCommand extends Command
 	public function execute(InputInterface $input, OutputInterface $output)
 	{
 		chRootDir();
-		
+
 		$selfUpdater = new SelfUpdater($this->getApplication());
 		$major = $input->getOption('major');
 		$pre = $input->getOption('pre');
@@ -63,6 +65,16 @@ class SelfUpdateCommand extends Command
 				$this->getApplication()->getName(),
 				$update->getVersion()
 			));
+
+			$changeLogCommand = $this->getApplication()->find('generate-changelog');
+			$commandInput = new ArrayInput([
+				'--batch' => true,
+				'starting_tag' => $this->getApplication()->getVersion(),
+				'ending_tag' => $update->getVersion()
+			]);
+			try {
+				$changeLogCommand->run($commandInput, $output);
+			} catch (Exception $e) {}
 		}
 	}
 }
