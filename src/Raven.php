@@ -3,10 +3,10 @@ use Exception;
 use Composer\Autoload\ClassLoader;
 use KevinGH\Version\Version;
 use SoapBox\Raven\Commands;
+use SoapBox\Raven\Storage\RavenStorage;
+use SoapBox\Raven\Storage\ProjectStorage;
 use SoapBox\Raven\Utils\ArgvInput;
 use SoapBox\Raven\Utils\DispatcherCommand;
-use SoapBox\Raven\Utils\ProjectStorage;
-use SoapBox\Raven\Utils\RavenStorage;
 use SoapBox\Raven\Utils\SelfUpdater;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -28,10 +28,8 @@ class Raven extends Application {
 
 		$projectStorage = ProjectStorage::getStorage();
 		if ($projectStorage->exists()) {
-			if ($plugins = $projectStorage->get('plugins')) {
-				foreach ($plugins as $namespace => $path) {
-					$classLoader->addPsr4($namespace, sprintf('%s/%s', getcwd(), $path));
-				}
+			foreach ($projectStorage->get('plugins', []) as $namespace => $path) {
+				$classLoader->addPsr4($namespace, sprintf('%s/%s', getcwd(), $path));
 			}
 		}
 	}

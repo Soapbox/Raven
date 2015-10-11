@@ -8,9 +8,9 @@ use SoapBox\Raven\ChangeLog\SectionEntry;
 use SoapBox\Raven\ChangeLog\Validator;
 use SoapBox\Raven\GitHub\Client;
 use SoapBox\Raven\GitHub\PullRequest;
+use SoapBox\Raven\Storage\RavenStorage;
+use SoapBox\Raven\Storage\ProjectStorage;
 use SoapBox\Raven\Utils\Command;
-use SoapBox\Raven\Utils\ProjectStorage;
-use SoapBox\Raven\Utils\RavenStorage;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -177,18 +177,14 @@ class GenerateChangelogCommand extends Command {
 		$batchMode = $input->getOption('batch');
 
 		$storage = ProjectStorage::getStorage();
-		if ($sections = $storage->get('changelog.sections')) {
-			foreach ($sections as $section => $description) {
-				$this->sections[$section] = [];
-				$this->sectionLabels[$section] = $description;
-			}
+		foreach ($storage->get('changelog.sections', []) as $section => $description) {
+			$this->sections[$section] = [];
+			$this->sectionLabels[$section] = $description;
 		}
 
 		$this->validators[] = new Validator($this->sections);
-		if ($validators = $storage->get('changelog.validators')) {
-			foreach ($validators as $validator) {
-				$this->validators[] = new $validator();
-			}
+		foreach ($storage->get('changelog.validators', []) as $validator) {
+			$this->validators[] = new $validator();
 		}
 
 		if (!$batchMode) {
@@ -241,8 +237,7 @@ class GenerateChangelogCommand extends Command {
 			$this->addPullRequest($response);
 		}
 
-		if ($formatterClass = $storage->get('changelog.formatter'))
-		{
+		if ($formatterClass = $storage->get('changelog.formatter')) {
 			$formatter = new $formatterClass();
 			$formatter->format($this->changeLog);
 		}
