@@ -130,5 +130,11 @@
         "sha1": "379fce8bf86a4175b2b26604b0d745707ddb1826",
         "url": "raven-1.6.0-5",
         "version": "1.6.0-5"
+    },
+    {
+        "name": "raven.phar",
+        "sha1": "0c9c8a1cc4d7157cc361fb128524e9ad64c63a49",
+        "url": "raven-1.6.0-6",
+        "version": "1.6.0-6"
     }
 ]
