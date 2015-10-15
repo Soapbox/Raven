@@ -80,7 +80,7 @@ class Client {
 		];
 
 		$response = $this->client->post('/authorizations', [
-			'auth' => [$email, $password],
+			'auth' => [$login, $password],
 			'body' => json_encode($params)
 		]);
 
