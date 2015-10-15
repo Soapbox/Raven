@@ -214,7 +214,7 @@ class GenerateChangelogCommand extends Command {
 			$output->writeln('<info>Fetching pull request information...</info>');
 		}
 
-		$accessToken = $this->getAccessToken($input, output);
+		$accessToken = $this->getAccessToken($input, $output);
 
 		$tags = $this->getReleaseTags($input);
 		$command = sprintf(
