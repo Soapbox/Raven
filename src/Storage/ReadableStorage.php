@@ -18,7 +18,7 @@ abstract class ReadableStorage
 		$this->dataFile = $filePath;
 
 		if (file_exists($filePath)) {
-			$fileLoaded = true;
+			$this->fileLoaded = true;
 			$this->data = json_decode(file_get_contents($this->dataFile), true);
 		}
 	}
