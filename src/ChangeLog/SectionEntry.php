@@ -84,7 +84,7 @@ class SectionEntry implements SectionEntryInterface
 		$result = $this->formatLine($this->getTitle());
 
 		foreach ($this->getSubText() as $subtext) {
-			$result .= $this->formatLine($subtext, true);
+			$result .= $this->formatLine('- '.$subtext, true);
 		}
 
 		return trim($result, " \r\n");

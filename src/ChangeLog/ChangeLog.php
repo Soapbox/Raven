@@ -10,6 +10,7 @@ class ChangeLog implements ChangeLogInterface
 	private $sections;
 	private $previousVersion;
 	private $currentVersion;
+	private $closedTickets = [];
 
 	public function __construct($previousVersion, $currentVersion)
 	{
@@ -90,12 +91,33 @@ class ChangeLog implements ChangeLogInterface
 		return $this->currentVersion;
 	}
 
+	/**
+	 * Add some text to the list of closed tickets
+	 *
+	 * @param string $ticket The ticket that was closed
+	 */
+	public function addClosedTicket($ticket) {
+		$this->closedTickets[] = $ticket;
+	}
+
 	public function __toString()
 	{
 		$result = $this->formatLine(sprintf('<info>%s</info>', $this->getTitle()));
 
 		foreach ($this->getSections() as $section) {
+			if ($section->getEntries()->isEmpty()) {
+				continue;
+			}
+
 			$result .= $this->formatLine($section, true);
+			$result .= "\n";
+		}
+
+		if (!empty($this->closedTickets)) {
+			$result .= $this->formatLine('   <comment>Closed Tickets</comment>');
+			foreach($this->closedTickets as $ticket) {
+				$result .= $this->formatLine(sprintf('      %s', $ticket));
+			}
 		}
 
 		return trim($result, " \r\n");

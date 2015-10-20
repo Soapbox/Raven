@@ -18,14 +18,8 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class GenerateChangelogCommand extends Command {
-	private $sections = [
-		'misc' => []
-	];
-
-	private $sectionLabels = [
-		'misc' => 'Other'
-	];
-
+	private $sections = [];
+	private $sectionLabels = [];
 	private $validators = [];
 	private $invalidEntries = [];
 
@@ -188,6 +182,8 @@ class GenerateChangelogCommand extends Command {
 			$this->sections[$section] = [];
 			$this->sectionLabels[$section] = $description;
 		}
+		$this->sections['misc'] = [];
+		$this->sectionLabels['misc'] = 'Other';
 
 		$this->validators[] = new Validator($this->sections);
 		foreach ($storage->get('changelog.validators', []) as $validator) {
@@ -225,6 +221,11 @@ class GenerateChangelogCommand extends Command {
 		$pullRequestNumbers = $this->exec($command);
 
 		$this->changeLog = new ChangeLog($tags['previous'], $tags['latest']);
+
+		foreach ($this->sections as $key => $value) {
+			$section = new Section($this->sectionLabels[$key]);
+			$this->changeLog->addSectionByKey($key, $section);
+		}
 
 		$response = $this->client->getPullRequests();
 		$pullRequests = json_decode($response->getBody());
