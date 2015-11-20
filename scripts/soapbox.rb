@@ -99,7 +99,13 @@ class Soapbox
     settings["sites"].each do |site|
       config.vm.provision "shell" do |s|
         s.path = scriptDir + "/serve.sh"
-        s.args = [site["map"], site["to"], site["port"] ||= "80", site["ssl"] ||= "443"]
+        s.args = [
+          site["map"],
+          site["to"],
+          site["port"] ||= "80",
+          site["ssl"] ||= "443",
+          site["ip"] ||= settings["ip"]
+        ]
       end
     end
 
