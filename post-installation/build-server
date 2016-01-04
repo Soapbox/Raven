@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# Installs and configures xdebug
+if [ "$EUID" -ne 0 ]
+	then echo "Please run as root"
+	exit
+fi
+
+print "Adding EPEL-6 repo ..."
+rpm -Uvh https://mirror.webtatic.com/yum/el6/latest.rpm
+
+print "Installing EPEL ..."
+yum install -y epel-release
+
+print "Updating yum ..."
+yum -y update
+
+print "Installing vim ..."
+yum install -y vim
+
+print "Installing git ..."
+yum install -y git
+
+print "Installing python ..."
+yum install -y python
+
+print "Installing python-pip ..."
+yum install -y python-pip
+
+print "Installing fabric ..."
+yum install -y fabric
+
+print "Installing php ..."
+yum -y install php56w php56w-opcache
+
+print "Installing composer ..."
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+
+print "Installing node ..."
+curl --silent --location https://rpm.nodesource.com/setup | bash -
+yum -y install nodejs
+
+print "Installing grunt-cli ..."
+npm install -g grunt-cli
+
+print "Installing bower ..."
+npm install -g bower
