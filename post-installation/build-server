@@ -51,3 +51,33 @@ npm install -g grunt-cli
 
 echo "Installing bower ..."
 npm install -g bower
+
+echo "Installing raven ... inside of raven"
+if [[ `which raven` != "/usr/local/bin/raven" ]]; then
+    (
+        cd $HOME/.applications
+        if [[ ! -d "raven" ]]; then
+            git clone -q git@github.com:SoapBox/raven.git raven
+        else
+            cd raven
+            git checkout .
+            git pull
+            cd ..
+        fi
+
+        # Get the latest build of raven
+        cd raven
+        startingBranch=$(git rev-parse --abbrev-ref HEAD)
+        git checkout releases
+        git pull
+        latestVersion=$(ls releases/ | awk '/^raven-[^-]+$/ {print $0}' | tail -n 1)
+        cp releases/$latestVersion raven
+        git checkout $startingBranch
+        cd ..
+
+        ln -s $HOME/.applications/raven/raven /usr/local/bin/raven
+        cd $HOME/.applications/raven
+        composer install
+        ./install.sh
+    )
+fi
