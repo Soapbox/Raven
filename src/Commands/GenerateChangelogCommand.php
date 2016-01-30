@@ -18,21 +18,16 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class GenerateChangelogCommand extends Command {
-	private $sections = [
-		'misc' => []
-	];
-
-	private $sectionLabels = [
-		'misc' => 'Other'
-	];
-
+	private $sections = [];
+	private $sectionLabels = [];
 	private $validators = [];
 	private $invalidEntries = [];
 
 	protected $command = 'generate-changelog';
 	protected $description = 'Generate a changelog for the current repo';
 
-	protected function addArguments() {
+	protected function addArguments()
+	{
 		$this->makeArgument('starting_tag')
 			->setDescription('The tag to start looking for pull requests.')
 			->setDefault('')
@@ -44,7 +39,8 @@ class GenerateChangelogCommand extends Command {
 			->optional();
 	}
 
-	protected function addOptions() {
+	protected function addOptions()
+	{
 		$this->makeOption('batch')
 			->setDescription('Run this command in batch mode.')
 			->boolean();
@@ -54,7 +50,8 @@ class GenerateChangelogCommand extends Command {
 			->boolean();
 	}
 
-	private function exec($command) {
+	private function exec($command)
+	{
 		$output = [];
 		$returnStatus = 0;
 
@@ -67,7 +64,8 @@ class GenerateChangelogCommand extends Command {
 		return $output;
 	}
 
-	private function getAccessToken() {
+	private function getAccessToken(InputInterface $input, OutputInterface $output)
+	{
 		$storage = RavenStorage::getStorage();
 
 		if (!$accessToken = $storage->get('github_access_token')) {
@@ -88,7 +86,8 @@ class GenerateChangelogCommand extends Command {
 		return $accessToken;
 	}
 
-	private function getReleaseTags(InputInterface $input) {
+	private function getReleaseTags(InputInterface $input)
+	{
 		$command = 'git tag';
 
 		if ($input->getOption('ignore-pre')) {
@@ -127,7 +126,8 @@ class GenerateChangelogCommand extends Command {
 		];
 	}
 
-	private function addToChangeLog($label, $pullRequest) {
+	private function addToChangeLog($label, $pullRequest)
+	{
 		$section = $this->changeLog->getSections()->get($label);
 
 		if (is_null($section)) {
@@ -148,7 +148,8 @@ class GenerateChangelogCommand extends Command {
 		}
 	}
 
-	private function addPullRequest($pullRequest) {
+	private function addPullRequest($pullRequest)
+	{
 		if ($pullRequest->getBaseBranch() !== 'master') {
 			return;
 		}
@@ -181,6 +182,8 @@ class GenerateChangelogCommand extends Command {
 			$this->sections[$section] = [];
 			$this->sectionLabels[$section] = $description;
 		}
+		$this->sections['misc'] = [];
+		$this->sectionLabels['misc'] = 'Other';
 
 		$this->validators[] = new Validator($this->sections);
 		foreach ($storage->get('changelog.validators', []) as $validator) {
@@ -207,7 +210,7 @@ class GenerateChangelogCommand extends Command {
 			$output->writeln('<info>Fetching pull request information...</info>');
 		}
 
-		$accessToken = $this->getAccessToken();
+		$accessToken = $this->getAccessToken($input, $output);
 
 		$tags = $this->getReleaseTags($input);
 		$command = sprintf(
@@ -218,6 +221,11 @@ class GenerateChangelogCommand extends Command {
 		$pullRequestNumbers = $this->exec($command);
 
 		$this->changeLog = new ChangeLog($tags['previous'], $tags['latest']);
+
+		foreach ($this->sections as $key => $value) {
+			$section = new Section($this->sectionLabels[$key]);
+			$this->changeLog->addSectionByKey($key, $section);
+		}
 
 		$response = $this->client->getPullRequests();
 		$pullRequests = json_decode($response->getBody());

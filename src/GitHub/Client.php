@@ -79,8 +79,8 @@ class Client {
 			"note" => "Raven"
 		];
 
-		$response = $client->post('/authorizations', [
-			'auth' => [$email, $password],
+		$response = $this->client->post('/authorizations', [
+			'auth' => [$login, $password],
 			'body' => json_encode($params)
 		]);
 
