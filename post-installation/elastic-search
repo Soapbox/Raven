@@ -8,7 +8,6 @@ cd /opt/jdk1.8.0_73/
 
 echo " --------------- Install JDK 8 and check the version.... --------------- "
 sudo alternatives --install /usr/bin/java java /opt/jdk1.8.0_73/bin/java 2
-java -version
 
 echo " --------------- Download and Install Elastic Search 2.2.... --------------- "
 cd ~; sudo wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.0/elasticsearch-2.2.0.tar.gz
