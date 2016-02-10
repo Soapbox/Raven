@@ -1,0 +1,42 @@
+### Download JDK 8
+cd /opt/; sudo wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u73-b02/jdk-8u73-linux-x64.tar.gz"
+sudo tar xzf jdk-8u73-linux-x64.tar.gz
+sudo rm -rf jdk-8u73-linux-x64.tar.gz
+cd /opt/jdk1.8.0_73/
+
+### Install JDK 8 and check the version
+# Question: should we use alternatives? how about jar, javac and environment variables setup?
+sudo alternatives --install /usr/bin/java java /opt/jdk1.8.0_73/bin/java 2
+# sudo alternatives --config java
+java -version
+
+### Download and Install Elastic Search 2.2
+cd ~; sudo wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.0/elasticsearch-2.2.0.tar.gz
+tar -xvf elasticsearch-2.2.0.tar.gz
+rm -rf elasticsearch-2.2.0.tar.gz
+
+### Setup localhost for Elastic Search 2.2
+# Question: should we update the setting of network.host instead of creating a new one?
+cd elasticsearch-2.2.0/config
+echo "network.host: 0.0.0.0" >> elasticsearch.yml
+
+### Download and Install Kibana
+cd ~; wget https://download.elastic.co/kibana/kibana/kibana-4.4.0-linux-x64.tar.gz
+tar xvf kibana-4.4.0-linux-x64.tar.gz
+rm -rf kibana-4.4.0-linux-x64.tar.gz
+
+### Install Timelion, Marvel and Sense Kibana plugins
+cd kibana-4.4.0-linux-x64
+./bin/kibana plugin --install kibana/timelion
+./bin/kibana plugin --install elasticsearch/marvel/latest
+./bin/kibana plugin --install elastic/sense
+
+### Download and Install Logstash
+cd ~; wget https://download.elastic.co/logstash/logstash/logstash-2.2.0.tar.gz
+tar xvf logstash-2.2.0.tar.gz
+rm -rf logstash-2.2.0.tar.gz
+
+### Update Vagrantfile to add the following
+# config.vm.network :forwarded_port, guest: 9200, host: 9200
+# config.vm.network :forwarded_port, guest: 9300, host: 9300
+# config.vm.network :forwarded_port, guest: 5601, host: 5601
