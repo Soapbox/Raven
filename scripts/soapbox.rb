@@ -51,7 +51,10 @@ class Soapbox
       80   => 8000,
       443  => 44300,
       3306 => 33060,
-      5432 => 54320
+      5432 => 54320,
+      9200 => 9200,
+      9300 => 9300,
+      5601 => 5601
     }
 
     # Use Default Port Forwarding Unless Overridden
