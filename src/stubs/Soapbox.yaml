@@ -20,3 +20,11 @@ sites:
 
 databases:
     - soapbox-v4
+
+ports:
+    - send: 9200
+      to: 9200
+    - send: 9300
+      to: 9300
+    - send: 5601
+      to: 5601
