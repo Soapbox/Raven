@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo " --------------- Download JDK 8.... --------------- "
+echo " --------------- Download JDK 8 (ELK is built with Java).... --------------- "
 cd /opt/; sudo wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u73-b02/jdk-8u73-linux-x64.tar.gz"
 sudo tar xzf jdk-8u73-linux-x64.tar.gz
 sudo rm -rf jdk-8u73-linux-x64.tar.gz
@@ -14,8 +14,12 @@ cd ~; sudo wget https://download.elasticsearch.org/elasticsearch/release/org/ela
 tar -xvf elasticsearch-2.2.0.tar.gz
 rm -rf elasticsearch-2.2.0.tar.gz
 
+echo " --------------- Install Elastic Search plugins.... --------------- "
+cd elasticsearch-2.2.0/
+./bin/plugin install delete-by-query
+
 echo " --------------- Setup localhost for Elastic Search 2.2.... --------------- "
-cd elasticsearch-2.2.0/config
+cd config
 echo "network.host: 0.0.0.0" >> elasticsearch.yml
 
 echo " --------------- Download and Install Kibana.... --------------- "
@@ -23,16 +27,18 @@ cd ~; wget https://download.elastic.co/kibana/kibana/kibana-4.4.0-linux-x64.tar.
 tar xvf kibana-4.4.0-linux-x64.tar.gz
 rm -rf kibana-4.4.0-linux-x64.tar.gz
 
-echo " --------------- Install Timelion, Marvel and Sense, etc. plugins.... --------------- "
+echo " --------------- Install Timelion, Marvel and Sense Kibana plugins.... --------------- "
 cd kibana-4.4.0-linux-x64
 ./bin/kibana plugin --install kibana/timelion
 ./bin/kibana plugin --install elasticsearch/marvel/latest
 ./bin/kibana plugin --install elastic/sense
 
-cd elasticsearch-2.2.0/
-./bin/plugin install delete-by-query
-
 echo " --------------- Download and Install Logstash.... --------------- "
 cd ~; wget https://download.elastic.co/logstash/logstash/logstash-2.2.0.tar.gz
 tar xvf logstash-2.2.0.tar.gz
 rm -rf logstash-2.2.0.tar.gz
+
+echo " --------------- Download and Install Filebeat.... --------------- "
+cd ~; sudo wget https://download.elastic.co/beats/filebeat/filebeat-1.1.1-x86_64.tar.gz
+tar -xvf filebeat-1.1.1-x86_64.tar.gz
+rm -rf filebeat-1.1.1-x86_64.tar.gz
