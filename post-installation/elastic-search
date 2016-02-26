@@ -23,11 +23,14 @@ cd ~; wget https://download.elastic.co/kibana/kibana/kibana-4.4.0-linux-x64.tar.
 tar xvf kibana-4.4.0-linux-x64.tar.gz
 rm -rf kibana-4.4.0-linux-x64.tar.gz
 
-echo " --------------- Install Timelion, Marvel and Sense Kibana plugins.... --------------- "
+echo " --------------- Install Timelion, Marvel and Sense, etc. plugins.... --------------- "
 cd kibana-4.4.0-linux-x64
 ./bin/kibana plugin --install kibana/timelion
 ./bin/kibana plugin --install elasticsearch/marvel/latest
 ./bin/kibana plugin --install elastic/sense
+
+cd elasticsearch-2.2.0/
+./bin/plugin install delete-by-query
 
 echo " --------------- Download and Install Logstash.... --------------- "
 cd ~; wget https://download.elastic.co/logstash/logstash/logstash-2.2.0.tar.gz
