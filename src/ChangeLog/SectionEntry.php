@@ -1,7 +1,8 @@
 <?php namespace SoapBox\Raven\ChangeLog;
 
-use Raven\Api\ChangeLog\SectionEntry as SectionEntryInterface;
 use SoapBox\Raven\GitHub\PullRequest;
+use SoapBox\Raven\Storage\ProjectStorage;
+use Raven\Api\ChangeLog\SectionEntry as SectionEntryInterface;
 
 class SectionEntry implements SectionEntryInterface
 {
@@ -14,7 +15,16 @@ class SectionEntry implements SectionEntryInterface
 	public function __construct(PullRequest $pullRequest)
 	{
 		$this->pullRequest = $pullRequest;
-		$title = trim(preg_replace('/^\[.*\]/', '', $pullRequest->getTitle()));
+
+		$storage = ProjectStorage::getStorage();
+		$sections = $storage->get('changelog.sections', []);
+
+		if (!empty($sections)) {
+			$labels = implode('|', array_keys($sections));
+			$title = preg_replace('/\[(?:'.$labels.')\]/i', '', $pullRequest->getTitle());
+		}
+
+		$title = trim($title);
 		$title = sprintf('      %s [#%s]', $title, $pullRequest->getNumber());
 		$this->setTitle($title);
 	}
