@@ -1,4 +1,5 @@
 <?php namespace SoapBox\Raven;
+
 use Exception;
 use Composer\Autoload\ClassLoader;
 use KevinGH\Version\Version;
@@ -15,156 +16,158 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Raven extends Application {
-	private $storage;
-	private $commands = [];
+class Raven extends Application
+{
+    private $storage;
+    private $commands = [];
 
-	public function __construct(ClassLoader $classLoader, $name = 'Raven', $version = '@version@')
-	{
-		parent::__construct($name, $version);
-		$this->registerCommands();
+    public function __construct(ClassLoader $classLoader, $name = 'Raven', $version = '@version@')
+    {
+        parent::__construct($name, $version);
+        $this->registerCommands();
 
-		$this->storage = RavenStorage::getStorage();
+        $this->storage = RavenStorage::getStorage();
 
-		$projectStorage = ProjectStorage::getStorage();
-		if ($projectStorage->exists()) {
-			foreach ($projectStorage->get('plugins', []) as $namespace => $path) {
-				$classLoader->addPsr4($namespace, sprintf('%s/%s', getcwd(), $path));
-			}
-		}
-	}
+        $projectStorage = ProjectStorage::getStorage();
+        if ($projectStorage->exists()) {
+            foreach ($projectStorage->get('plugins', []) as $namespace => $path) {
+                $classLoader->addPsr4($namespace, sprintf('%s/%s', getcwd(), $path));
+            }
+        }
+    }
 
-	private function registerCommands()
-	{
-		$dir = __DIR__ . '/Commands';
-		$files = scandir($dir);
+    private function registerCommands()
+    {
+        $dir = __DIR__ . '/Commands';
+        $files = scandir($dir);
 
-		foreach ($files as $file) {
-			if (is_file($dir . '/' . $file)) {
-				$class = sprintf('SoapBox\Raven\Commands\%s', rtrim($file, '.php'));
-				$c = $this->add(new $class);
-			}
-		}
-	}
+        foreach ($files as $file) {
+            if (is_file($dir . '/' . $file)) {
+                $class = sprintf('SoapBox\Raven\Commands\%s', rtrim($file, '.php'));
+                $c = $this->add(new $class);
+            }
+        }
+    }
 
-	/**
-	 * Check to see if the current version of Raven is out of date
-	 */
-	private function isOutdated()
-	{
-		$currentVersion = new Version($this->getVersion());
-		$latestVersion = new Version($this->storage->get('latest_version'));
-		if ($latestVersion->isGreaterThan($currentVersion)) {
-			return true;
-		}
+    /**
+     * Check to see if the current version of Raven is out of date
+     */
+    private function isOutdated()
+    {
+        $currentVersion = new Version($this->getVersion());
+        $latestVersion = new Version($this->storage->get('latest_version'));
+        if ($latestVersion->isGreaterThan($currentVersion)) {
+            return true;
+        }
 
-		$lastUpdateCheck = (int) $this->storage->get('last_update_check');
+        $lastUpdateCheck = (int) $this->storage->get('last_update_check');
 
-		if (time() - $lastUpdateCheck < 60 * 60 * 8 && $lastUpdateCheck > 0) {
-			return false;
-		}
+        if (time() - $lastUpdateCheck < 60 * 60 * 8 && $lastUpdateCheck > 0) {
+            return false;
+        }
 
-		$this->storage->set('last_update_check', time());
+        $this->storage->set('last_update_check', time());
 
-		$currentDir = getcwd();
-		chRootDir();
+        $currentDir = getcwd();
+        chRootDir();
 
-		$selfUpdater = new SelfUpdater($this);
-		$selfUpdater->getVersion()->setPreRelease(null);
-		$update = $selfUpdater->getUpdate();
+        $selfUpdater = new SelfUpdater($this);
+        $selfUpdater->getVersion()->setPreRelease(null);
+        $update = $selfUpdater->getUpdate();
 
-		chdir($currentDir);
+        chdir($currentDir);
 
-		if ( !is_null($update) && $update->isNewer($selfUpdater->getVersion()) ) {
-			$this->storage->set('latest_version', (string) $update->getVersion());
-			return true;
-		}
+        if (!is_null($update) && $update->isNewer($selfUpdater->getVersion())) {
+            $this->storage->set('latest_version', (string) $update->getVersion());
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Initialize custom styles
-	 */
-	private function initializeStyles(OutputInterface $output)
-	{
-		$output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
-	}
+    /**
+     * Initialize custom styles
+     */
+    private function initializeStyles(OutputInterface $output)
+    {
+        $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
+    }
 
-	public function run(InputInterface $input = null, OutputInterface $output = null)
-	{
-		if (null === $input) {
-			$input = new ArgvInput();
-		}
+    public function run(InputInterface $input = null, OutputInterface $output = null)
+    {
+        if (null === $input) {
+            $input = new ArgvInput();
+        }
 
-		if (null === $output) {
-			$output = new ConsoleOutput();
-		}
+        if (null === $output) {
+            $output = new ConsoleOutput();
+        }
 
-		try {
-			$commandName = $this->getCommandName($input);
-			if (!empty($commandName)) {
-				$command = $this->find($commandName);
-				if ($command instanceof DispatcherCommand) {
-					$input->makeDispatcher();
-				}
-			}
-		} catch (Exception $e) {
-			if ($output instanceof ConsoleOutputInterface) {
-				$this->renderException($e, $output->getErrorOutput());
-			} else {
-				$this->renderException($e, $output);
-			}
+        try {
+            $commandName = $this->getCommandName($input);
+            if (!empty($commandName)) {
+                $command = $this->find($commandName);
+                if ($command instanceof DispatcherCommand) {
+                    $input->makeDispatcher();
+                }
+            }
+        } catch (Exception $e) {
+            if ($output instanceof ConsoleOutputInterface) {
+                $this->renderException($e, $output->getErrorOutput());
+            } else {
+                $this->renderException($e, $output);
+            }
 
-			$exitCode = $e->getCode();
-			if (is_numeric($exitCode)) {
-				$exitCode = (int) $exitCode;
-				if (0 === $exitCode) {
-					$exitCode = 1;
-				}
-			} else {
-				$exitCode = 1;
-			}
+            $exitCode = $e->getCode();
+            if (is_numeric($exitCode)) {
+                $exitCode = (int) $exitCode;
+                if (0 === $exitCode) {
+                    $exitCode = 1;
+                }
+            } else {
+                $exitCode = 1;
+            }
 
-			exit($exitCode);
-		}
+            exit($exitCode);
+        }
 
-		return parent::run($input, $output);
-	}
+        return parent::run($input, $output);
+    }
 
-	public function doRun(InputInterface $input, OutputInterface $output)
-	{
-		$this->initializeStyles($output);
+    public function doRun(InputInterface $input, OutputInterface $output)
+    {
+        $this->initializeStyles($output);
 
-		$command = $this->getCommandName($input);
+        $command = $this->getCommandName($input);
 
-		if ($this->isOutdated() && $command != 'self-update') {
-			$output->writeln(sprintf("<warning>There is a newer version of %s available. Run %s to update.</warning>\n",
-				$this->getName(),
-				'self-update'
-			));
-		}
+        if ($this->isOutdated() && $command != 'self-update') {
+            $output->writeln(sprintf(
+                "<warning>There is a newer version of %s available. Run %s to update.</warning>\n",
+                $this->getName(),
+                'self-update'
+            ));
+        }
 
-		return parent::doRun($input, $output);
-	}
+        return parent::doRun($input, $output);
+    }
 
-	public function add(Command $command)
-	{
-		$this->commands[$command->getName()] = $command;
+    public function add(Command $command)
+    {
+        $this->commands[$command->getName()] = $command;
 
-		return parent::add($command);
-	}
+        return parent::add($command);
+    }
 
-	public function find($name)
-	{
-		if (isset($this->commands[$name])) {
-			$command = $this->commands[$name];
+    public function find($name)
+    {
+        if (isset($this->commands[$name])) {
+            $command = $this->commands[$name];
 
-			if ($command instanceof DispatcherCommand) {
-				return $command;
-			}
-		}
+            if ($command instanceof DispatcherCommand) {
+                return $command;
+            }
+        }
 
-		return parent::find($name);
-	}
+        return parent::find($name);
+    }
 }

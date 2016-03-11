@@ -13,7 +13,7 @@ class TextDescriptor extends Descriptor
         if ($command instanceof RavenCommand) {
             $sections = $command->getHelpSections();
 
-            foreach($sections as $section) {
+            foreach ($sections as $section) {
                 $this->writeText("\n");
                 $this->writeText(sprintf('<comment>%s:</comment>', $section->getTitle()), $options);
                 $this->writeText("\n");

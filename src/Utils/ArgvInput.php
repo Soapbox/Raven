@@ -30,7 +30,8 @@ class ArgvInput extends Input
         parent::__construct($definition);
     }
 
-    public function makeDispatcher() {
+    public function makeDispatcher()
+    {
         $this->dispatcher = true;
     }
 

@@ -8,48 +8,49 @@ use Symfony\Component\Process\Process;
 
 class GitConfigureCommand extends Command
 {
-	protected $command = 'git-configure';
-	protected $description = 'Configure git hooks for the current repository.';
+    protected $command = 'git-configure';
+    protected $description = 'Configure git hooks for the current repository.';
 
-	protected function addOptions() {
-		$this->makeOption('new-only')
-			->setDescription('Only install the hooks that do not exist.')
-			->boolean();
-	}
+    protected function addOptions()
+    {
+        $this->makeOption('new-only')
+            ->setDescription('Only install the hooks that do not exist.')
+            ->boolean();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$output->writeln('<info>Configuring git hooks...</info>');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('<info>Configuring git hooks...</info>');
 
-		$currentDir = getcwd();
-		chRootDir();
+        $currentDir = getcwd();
+        chRootDir();
 
-		$process = new Process("git pull");
-		$process->run();
+        $process = new Process("git pull");
+        $process->run();
 
-		chdir($currentDir);
+        chdir($currentDir);
 
-		$process = new Process("git rev-parse --show-toplevel");
-		$process->run();
-		
-		if ( !$process->isSuccessful() ||  $process->getOutput() == '') {
-			throw new RuntimeException('You are not currently in a git repository.');
-		}
+        $process = new Process("git rev-parse --show-toplevel");
+        $process->run();
 
-		$gitHookDir = trim($process->getOutput(), " \n\r") . '/.git/hooks/';
-		$files = glob(getRootDir() . '/scripts/git-hooks/*');
+        if (!$process->isSuccessful() ||  $process->getOutput() == '') {
+            throw new RuntimeException('You are not currently in a git repository.');
+        }
 
-		foreach ($files as $file) {
-			if (is_file($file)) {
-				$newFile = $gitHookDir . substr($file, strrpos($file, '/') + 1);
-				if($input->getOption('new-only') && file_exists($newFile)) {
-					continue;
-				}
-				copy($file, $newFile);
-				chmod($newFile, fileperms($file));
-			}
-		}
+        $gitHookDir = trim($process->getOutput(), " \n\r") . '/.git/hooks/';
+        $files = glob(getRootDir() . '/scripts/git-hooks/*');
 
-		$output->writeln('<info>Completed.</info>');
-	}
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                $newFile = $gitHookDir . substr($file, strrpos($file, '/') + 1);
+                if ($input->getOption('new-only') && file_exists($newFile)) {
+                    continue;
+                }
+                copy($file, $newFile);
+                chmod($newFile, fileperms($file));
+            }
+        }
+
+        $output->writeln('<info>Completed.</info>');
+    }
 }

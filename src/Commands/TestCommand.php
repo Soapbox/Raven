@@ -5,111 +5,118 @@ use SoapBox\Raven\Utils\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TestCommand extends RunCommand {
-	protected $command = 'test';
-	protected $description = 'Run the testsuites.';
-	private $vagrant;
+class TestCommand extends RunCommand
+{
+    protected $command = 'test';
+    protected $description = 'Run the testsuites.';
+    private $vagrant;
 
-	public function isEnabled() {
-		return false;
-	}
+    public function isEnabled()
+    {
+        return false;
+    }
 
-	protected function addArguments() {}
+    protected function addArguments()
+    {
 
-	protected function addOptions() {
-		$this->makeOption('all')
-			->addShortcut('a')
-			->setDescription('Run all testsuites.')
-			->boolean();
+    }
 
-		$this->makeOption('unit')
-			->addShortcut('u')
-			->setDescription('Run the unit testsuite.')
-			->boolean();
+    protected function addOptions()
+    {
+        $this->makeOption('all')
+            ->addShortcut('a')
+            ->setDescription('Run all testsuites.')
+            ->boolean();
 
-		$this->makeOption('integration')
-			->addShortcut('i')
-			->setDescription('Run the integration testsuite.')
-			->boolean();
+        $this->makeOption('unit')
+            ->addShortcut('u')
+            ->setDescription('Run the unit testsuite.')
+            ->boolean();
 
-		$this->makeOption('permission')
-			->addShortcut('p')
-			->setDescription('Run the permission testsuite.')
-			->boolean();
+        $this->makeOption('integration')
+            ->addShortcut('i')
+            ->setDescription('Run the integration testsuite.')
+            ->boolean();
 
-		$this->makeOption('filter')
-			->addShortcut('f')
-			->setDescription('Run only the tests that meet the supplied filters.')
-			->isArray();
+        $this->makeOption('permission')
+            ->addShortcut('p')
+            ->setDescription('Run the permission testsuite.')
+            ->boolean();
 
-		$this->makeOption('testsuite')
-			->addShortcut('t')
-			->setDescription('Run only the supplied testsuites.')
-			->isArray();
+        $this->makeOption('filter')
+            ->addShortcut('f')
+            ->setDescription('Run only the tests that meet the supplied filters.')
+            ->isArray();
 
-		$this->makeOption('no-refresh')
-			->setDescription('Do not refresh the database for integration tests.')
-			->boolean();
+        $this->makeOption('testsuite')
+            ->addShortcut('t')
+            ->setDescription('Run only the supplied testsuites.')
+            ->isArray();
 
-		$this->makeOption('vagrant')
-			->setDescription('Run the tests from within the vagrant box.');
-	}
+        $this->makeOption('no-refresh')
+            ->setDescription('Do not refresh the database for integration tests.')
+            ->boolean();
 
-	private function runTest($command) {
-		$returnValue = 0;
+        $this->makeOption('vagrant')
+            ->setDescription('Run the tests from within the vagrant box.');
+    }
 
-		if ($this->vagrant) {
-			$this->runCommand($command, $returnValue);
-		} else {
-			passthru($command, $returnValue);
-		}
+    private function runTest($command)
+    {
+        $returnValue = 0;
 
-		return $returnValue;
-	}
+        if ($this->vagrant) {
+            $this->runCommand($command, $returnValue);
+        } else {
+            passthru($command, $returnValue);
+        }
 
-	public function execute(InputInterface $input, OutputInterface $output)
-	{
-		$exitStatus = 0;
+        return $returnValue;
+    }
 
-		$this->vagrant = $input->getOption('vagrant');
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        $exitStatus = 0;
 
-		if($input->getOption('unit') || $input->getOption('all')) {
-			$output->writeln('<info>Running unit tests...</info>');
-			$exitStatus |= $this->runTest('phpunit --testsuite unit');
-		}
+        $this->vagrant = $input->getOption('vagrant');
 
-		if($input->getOption('integration') || $input->getOption('all')) {
-			if ( !$input->getOption('no-refresh') ) {
-				$refreshCommand = new RefreshCommand();
-				$refreshCommand->execute($input, $output);
-			}
-			$output->writeln('<info>Running integration tests...</info>');
-			$exitStatus |= $this->runTest('phpunit --testsuite integration');
-		}
+        if ($input->getOption('unit') || $input->getOption('all')) {
+            $output->writeln('<info>Running unit tests...</info>');
+            $exitStatus |= $this->runTest('phpunit --testsuite unit');
+        }
 
-		if($input->getOption('permission') || $input->getOption('all')) {
-			$output->writeln('<info>Running permission tests...</info>');
-			$exitStatus |= $this->runTest('phpunit --testsuite integration-permission');
-		}
+        if ($input->getOption('integration') || $input->getOption('all')) {
+            if (!$input->getOption('no-refresh')) {
+                $refreshCommand = new RefreshCommand();
+                $refreshCommand->execute($input, $output);
+            }
+            $output->writeln('<info>Running integration tests...</info>');
+            $exitStatus |= $this->runTest('phpunit --testsuite integration');
+        }
 
-		$filters = $input->getOption('filter');
-		if (count($filters) > 0) {
-			$output->writeln('<info>Running filtered tests...</info>');
+        if ($input->getOption('permission') || $input->getOption('all')) {
+            $output->writeln('<info>Running permission tests...</info>');
+            $exitStatus |= $this->runTest('phpunit --testsuite integration-permission');
+        }
 
-			foreach ($input->getOption('filter') as $filter) {
-				$output->writeln(sprintf('<info>Running %s tests...</info>', $filter));
-				$exitStatus |= $this->runTest(sprintf('phpunit --filter %s', $filter));
-			}
-		}
+        $filters = $input->getOption('filter');
+        if (count($filters) > 0) {
+            $output->writeln('<info>Running filtered tests...</info>');
 
-		$testsuites = $input->getOption('testsuite');
-		if (count($testsuites) > 0) {
-			$output->writeln('<info>Running testsuites...</info>');
+            foreach ($input->getOption('filter') as $filter) {
+                $output->writeln(sprintf('<info>Running %s tests...</info>', $filter));
+                $exitStatus |= $this->runTest(sprintf('phpunit --filter %s', $filter));
+            }
+        }
 
-			foreach ($input->getOption('testsuite') as $testsuite) {
-				$output->writeln(sprintf('<info>Running %s testsuite...</info>', $testsuite));
-				$exitStatus |= $this->runTest(sprintf('phpunit --testsuite %s', $testsuite));
-			}
-		}
-	}
+        $testsuites = $input->getOption('testsuite');
+        if (count($testsuites) > 0) {
+            $output->writeln('<info>Running testsuites...</info>');
+
+            foreach ($input->getOption('testsuite') as $testsuite) {
+                $output->writeln(sprintf('<info>Running %s testsuite...</info>', $testsuite));
+                $exitStatus |= $this->runTest(sprintf('phpunit --testsuite %s', $testsuite));
+            }
+        }
+    }
 }

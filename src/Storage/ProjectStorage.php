@@ -5,36 +5,36 @@ use SoapBox\Raven\Helpers\GitHelper;
 
 class ProjectStorage extends ReadableStorage
 {
-	protected static $instance;
+    protected static $instance;
 
-	private $projectRoot = '';
+    private $projectRoot = '';
 
-	protected function __construct()
-	{
-		$root = getcwd();
-		$file = $root . '/raven.json';
-		if (!file_exists($file)) {
-			try {
-				$root = GitHelper::getRepositoryRoot();
+    protected function __construct()
+    {
+        $root = getcwd();
+        $file = $root . '/raven.json';
+        if (!file_exists($file)) {
+            try {
+                $root = GitHelper::getRepositoryRoot();
 
-				$file = $root  . '/raven.json';
-			} catch (RuntimeException $e) {}
-		}
+                $file = $root  . '/raven.json';
+            } catch (RuntimeException $e) {}
+        }
 
-		$this->loadFile($file);
+        $this->loadFile($file);
 
-		if ($this->exists()) {
-			$this->projectRoot = $root;
-		}
-	}
+        if ($this->exists()) {
+            $this->projectRoot = $root;
+        }
+    }
 
-	/**
-	 * Get the rot directory of the current project
-	 *
-	 * @return string
-	 */
-	public function getProjectRoot()
-	{
-		return $this->projectRoot;
-	}
+    /**
+     * Get the rot directory of the current project
+     *
+     * @return string
+     */
+    public function getProjectRoot()
+    {
+        return $this->projectRoot;
+    }
 }
