@@ -1,5 +1,6 @@
 <?php namespace SoapBox\Raven\Utils;
 
+use SoapBox\Raven\Storage\ProjectStorage;
 use SoapBox\Raven\Utils\DispatcherCommand;
 
 class ProjectCommand extends DispatcherCommand
@@ -7,12 +8,14 @@ class ProjectCommand extends DispatcherCommand
     private $path;
     private $namespace;
 
-    public function __construct($command, $description, $path, $namespace)
+    public function __construct()
     {
-        $this->command = $command;
-        $this->description = $description;
-        $this->path = $path;
-        $this->namespace = $namespace;
+        $projectStorage = ProjectStorage::getStorage();
+
+        $this->command = $projectStorage->get('commands.name');
+        $this->description = $projectStorage->get('commands.description');
+        $this->path = $projectStorage->get('commands.path');
+        $this->namespace = $projectStorage->get('commands.namespace');
 
         parent::__construct();
     }

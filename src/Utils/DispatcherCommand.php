@@ -153,7 +153,7 @@ abstract class DispatcherCommand extends Command
 
         $dir = $this->getCommandDirectory();
         $namespace = $this->getCommandNamespace();
-        $files = scandir($dir);
+        $files = array_diff(scandir($dir), ['.', '..']);
 
         foreach ($files as $file) {
             $class = sprintf('%s\%s', $namespace, trim($file, '.php'));

@@ -40,8 +40,14 @@ class ProjectStorage extends ReadableStorage
         return $this->projectRoot;
     }
 
+    /**
+     * Determine whether or not there are any project commands
+     *
+     * @return boolean
+     */
     public function hasCommands()
     {
-        return $this->has('commands');
+        return $this->has('commands') &&
+            !empty(array_diff(scandir($this->get('commands.path')), ['.', '..']));
     }
 }

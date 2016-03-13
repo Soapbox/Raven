@@ -40,12 +40,7 @@ class Raven extends Application
         }
 
         if ($projectStorage->hasCommands()) {
-            $this->add(new ProjectCommand(
-                $projectStorage->get('commands.name'),
-                $projectStorage->get('commands.description'),
-                $projectStorage->get('commands.path'),
-                $projectStorage->get('commands.namespace')
-            ));
+            $this->add(new ProjectCommand());
         }
     }
 
