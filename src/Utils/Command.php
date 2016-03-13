@@ -12,70 +12,76 @@ use Symfony\Component\Process\Process;
 
 class Command extends SymfonyCommand
 {
-	protected $command = '';
-	protected $description = '';
-	private $options = [];
-	private $arguments = [];
-	private $helpSections = [];
+    protected $command = '';
+    protected $description = '';
+    private $options = [];
+    private $arguments = [];
+    private $helpSections = [];
 
-	protected function configure()
-	{
-		$this->setName($this->command);
-		$this->setDescription($this->description);
+    protected function configure()
+    {
+        $this->setName($this->command);
+        $this->setDescription($this->description);
 
-		$this->addArguments();
-		$this->addOptions();
+        $this->addArguments();
+        $this->addOptions();
 
-		foreach ($this->options as $option)
-		{
-			$this->addOption(
-				$option->getName(),
-				$option->getShortcut(),
-				$option->getMode(),
-				$option->getDescription(),
-				$option->getDefault()
-			);
-		}
+        foreach ($this->options as $option) {
+            $this->addOption(
+                $option->getName(),
+                $option->getShortcut(),
+                $option->getMode(),
+                $option->getDescription(),
+                $option->getDefault()
+            );
+        }
 
-		foreach ($this->arguments as $argument)
-		{
-			$this->addArgument(
-				$argument->getName(),
-				$argument->getMode(),
-				$argument->getDescription(),
-				$argument->getDefault()
-			);
-		}
-	}
+        foreach ($this->arguments as $argument) {
+            $this->addArgument(
+                $argument->getName(),
+                $argument->getMode(),
+                $argument->getDescription(),
+                $argument->getDefault()
+            );
+        }
+    }
 
-	protected function addArguments() {}
-	protected function addOptions() {}
+    protected function addArguments()
+    {
 
-	protected function makeOption($name)
-	{
-		$option = new Option($name);
-		$this->options[] = $option;
-		return $option;
-	}
+    }
+    protected function addOptions()
+    {
 
-	protected function makeArgument($name)
-	{
-		$argument = new Argument($name);
-		$this->arguments[] = $argument;
-		return $argument;
-	}
+    }
 
-	protected function makeSection($title) {
-		$key = strtolower(str_replace(' ', '_', $title));
+    protected function makeOption($name)
+    {
+        $option = new Option($name);
+        $this->options[] = $option;
+        return $option;
+    }
 
-		$section = new HelpSection();
-		$section->setTitle($title);
-		$this->helpSections[$key] = $section;
+    protected function makeArgument($name)
+    {
+        $argument = new Argument($name);
+        $this->arguments[] = $argument;
+        return $argument;
+    }
 
-		return $section;
-	}
+    protected function makeSection($title)
+    {
+        $key = strtolower(str_replace(' ', '_', $title));
 
-	public function getHelpSections() {
-		return $this->helpSections;
-	}
+        $section = new HelpSection();
+        $section->setTitle($title);
+        $this->helpSections[$key] = $section;
+
+        return $section;
+    }
+
+    public function getHelpSections()
+    {
+        return $this->helpSections;
+    }
 }

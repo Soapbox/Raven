@@ -6,46 +6,53 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
-class RebuildCommand extends RunCommand {
-	protected $command = 'rebuild';
-	protected $description = 'Rebuild the database';
+class RebuildCommand extends RunCommand
+{
+    protected $command = 'rebuild';
+    protected $description = 'Rebuild the database';
 
-	protected function addArguments() {}
-	protected function addOptions() {}
+    protected function addArguments()
+    {
 
-	public function execute(InputInterface $input, OutputInterface $output)
-	{
-		$currentDir = getcwd();
+    }
+    protected function addOptions()
+    {
 
-		chRootDir();
+    }
 
-		$output->writeln('<info>Rebuilding the database...</info>');
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        $currentDir = getcwd();
 
-		$command = '
-			mysql -u soapbox -psecret -e \'DROP DATABASE \\`soapbox-v4\\`\'
-			mysql -u soapbox -psecret -e \'CREATE DATABASE \\`soapbox-v4\\`\'
-		';
+        chRootDir();
 
-		$returnStatus = 0;
+        $output->writeln('<info>Rebuilding the database...</info>');
 
-		$this->runCommand($command, $returnStatus, false);
+        $command = '
+            mysql -u soapbox -psecret -e \'DROP DATABASE \\`soapbox-v4\\`\'
+            mysql -u soapbox -psecret -e \'CREATE DATABASE \\`soapbox-v4\\`\'
+        ';
 
-		if ($returnStatus !== 0) {
-			throw new RuntimeException('Failed to rebuild the database.');
-		}
+        $returnStatus = 0;
 
-		$output->writeln('<info>Rebuild complete.</info>');
-		$output->writeln('');
+        $this->runCommand($command, $returnStatus, false);
 
-		chdir($currentDir);
+        if ($returnStatus !== 0) {
+            throw new RuntimeException('Failed to rebuild the database.');
+        }
 
-		$process = new Process("php artisan migrate --seed --ansi");
-		$process->run(function ($type, $line) use ($output) {
-			$output->write($line);
-		});
+        $output->writeln('<info>Rebuild complete.</info>');
+        $output->writeln('');
 
-		if ( !$process->isSuccessful() ) {
-			throw new RuntimeException('Failed to run database migrations.');
-		}
-	}
+        chdir($currentDir);
+
+        $process = new Process("php artisan migrate --seed --ansi");
+        $process->run(function ($type, $line) use ($output) {
+            $output->write($line);
+        });
+
+        if (!$process->isSuccessful()) {
+            throw new RuntimeException('Failed to run database migrations.');
+        }
+    }
 }

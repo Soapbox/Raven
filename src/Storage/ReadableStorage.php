@@ -2,81 +2,84 @@
 
 abstract class ReadableStorage
 {
-	private $fileLoaded = false;
-	protected $data = [];
-	protected $dataFile;
+    private $fileLoaded = false;
+    protected $data = [];
+    protected $dataFile;
 
-	protected function __construct() {}
+    protected function __construct()
+    {
 
-	/**
-	 * Load the file's data
-	 *
-	 * @param string $filePath The file to load
-	 */
-	protected function loadFile($filePath)
-	{
-		$this->dataFile = $filePath;
+    }
 
-		if (file_exists($filePath)) {
-			$this->fileLoaded = true;
-			$this->data = json_decode(file_get_contents($this->dataFile), true);
-		}
-	}
+    /**
+     * Load the file's data
+     *
+     * @param string $filePath The file to load
+     */
+    protected function loadFile($filePath)
+    {
+        $this->dataFile = $filePath;
 
-	/**
-	 * Get an element from the stoarage
-	 *
-	 * @param string $key     The key for which to search the storage
-	 * @param mized  $default The deafault value for when the key is not found
-	 * @return mixed
-	 */
-	public function get($key, $default = null)
-	{
-		$keys = explode('.', $key);
+        if (file_exists($filePath)) {
+            $this->fileLoaded = true;
+            $this->data = json_decode(file_get_contents($this->dataFile), true);
+        }
+    }
 
-		$data = $this->data;
-		foreach ($keys as $key) {
-			if (!is_array($data) || !array_key_exists($key, $data)) {
-				return $default;
-			}
+    /**
+     * Get an element from the stoarage
+     *
+     * @param string $key     The key for which to search the storage
+     * @param mized  $default The deafault value for when the key is not found
+     * @return mixed
+     */
+    public function get($key, $default = null)
+    {
+        $keys = explode('.', $key);
 
-			$data = $data[$key];
-		}
+        $data = $this->data;
+        foreach ($keys as $key) {
+            if (!is_array($data) || !array_key_exists($key, $data)) {
+                return $default;
+            }
 
-		return $data;
-	}
+            $data = $data[$key];
+        }
 
-	/**
-	 * Check to see if the storage contains a value
-	 *
-	 * @param string $key The key to check
-	 * @return bool
-	 */
-	public function has($key)
-	{
-		return !is_null($this->get($key));
-	}
+        return $data;
+    }
 
-	/**
-	 * Get whether or not the storage file exists
-	 *
-	 * @return bool
-	 */
-	public function exists()
-	{
-		return $this->fileLoaded;
-	}
+    /**
+     * Check to see if the storage contains a value
+     *
+     * @param string $key The key to check
+     * @return bool
+     */
+    public function has($key)
+    {
+        return !is_null($this->get($key));
+    }
 
-	/**
-	 * Get the singleton instance of the storage
-	 *
-	 * @return ReadableStorage
-	 */
-	public static function getStorage()
-	{
-		if (is_null(static::$instance)) {
-			static::$instance = new static();
-		}
-		return static::$instance;
-	}
+    /**
+     * Get whether or not the storage file exists
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        return $this->fileLoaded;
+    }
+
+    /**
+     * Get the singleton instance of the storage
+     *
+     * @return ReadableStorage
+     */
+    public static function getStorage()
+    {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
 }

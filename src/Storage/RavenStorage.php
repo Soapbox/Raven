@@ -2,10 +2,10 @@
 
 class RavenStorage extends WritableStorage
 {
-	protected static $instance;
+    protected static $instance;
 
-	protected function __construct()
-	{
-		$this->loadFile(soapbox_path() . '/.ravendata');
-	}
+    protected function __construct()
+    {
+        $this->loadFile(soapbox_path() . '/.ravendata');
+    }
 }

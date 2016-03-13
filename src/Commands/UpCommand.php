@@ -16,8 +16,8 @@ class UpCommand extends Command
     protected function configure()
     {
         $this->setName('up')
-                  ->setDescription('Start the SoapBox machine')
-                  ->addOption('provision', null, InputOption::VALUE_NONE, 'Run the provisioners on the box.');
+            ->setDescription('Start the SoapBox machine')
+            ->addOption('provision', null, InputOption::VALUE_NONE, 'Run the provisioners on the box.');
     }
 
     /**

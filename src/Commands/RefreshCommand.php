@@ -8,18 +8,18 @@ use Symfony\Component\Process\Process;
 
 class RefreshCommand extends Command
 {
-	protected $command = 'refresh';
-	protected $description = 'Refresh and reseed the database';
+    protected $command = 'refresh';
+    protected $description = 'Refresh and reseed the database';
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$process = new Process("php artisan migrate:refresh --seed --ansi");
-		$process->run(function ($type, $line) use ($output) {
-				$output->write($line);
-		});
-		
-		if ( !$process->isSuccessful() ) {
-			throw new RuntimeException('Failed to rollback and re-run the database migraions.');
-		}
-	}
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $process = new Process("php artisan migrate:refresh --seed --ansi");
+        $process->run(function ($type, $line) use ($output) {
+                $output->write($line);
+        });
+
+        if (!$process->isSuccessful()) {
+            throw new RuntimeException('Failed to rollback and re-run the database migraions.');
+        }
+    }
 }

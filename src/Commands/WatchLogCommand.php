@@ -7,21 +7,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class WatchLogCommand extends Command
 {
-	protected $command = 'watch-log';
-	protected $description = 'Tail the latest log file.';
-	private $vagrant;
+    protected $command = 'watch-log';
+    protected $description = 'Tail the latest log file.';
+    private $vagrant;
 
-	protected function addArguments()
-	{
-		$this->makeArgument('path')
-			->setDescription('The path to the log file to watch')
-			->setDefault('app/storage/logs');
-	}
+    protected function addArguments()
+    {
+        $this->makeArgument('path')
+            ->setDescription('The path to the log file to watch')
+            ->setDefault('app/storage/logs');
+    }
 
-	protected function addOptions() {}
+    protected function addOptions()
+    {
 
-	public function execute(InputInterface $input, OutputInterface $output)
-	{
-		system('cd ' . $input->getArgument('path') . ' && tail -f -n `ls -t | head -1 | xargs cat | wc -l` `ls -t | head -1`');
-	}
+    }
+
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        system('cd ' . $input->getArgument('path') . ' && tail -f -n `ls -t | head -1 | xargs cat | wc -l` `ls -t | head -1`');
+    }
 }
