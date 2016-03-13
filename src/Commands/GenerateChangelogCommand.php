@@ -200,7 +200,7 @@ class GenerateChangelogCommand extends Command
         $remoteUrl = $this->exec('git config --get remote.origin.url');
 
         $matches = [];
-        if ( !preg_match('/^git@github\.com\:(?P<owner>.+)\/(?P<repo>.+)\.git$/', $remoteUrl[0], $matches) ) {
+        if (!preg_match('/^git@github\.com\:(?P<owner>.+)\/(?P<repo>.+)\.git$/', $remoteUrl[0], $matches)) {
             throw new RuntimeException('Cannot find a remote git repository.');
         }
         $repoOwner = $matches['owner'];

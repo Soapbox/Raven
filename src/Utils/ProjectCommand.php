@@ -2,6 +2,7 @@
 
 use SoapBox\Raven\Storage\ProjectStorage;
 use SoapBox\Raven\Utils\DispatcherCommand;
+use SoapBox\Raven\Utils\Plugins\PluginCommand;
 
 class ProjectCommand extends DispatcherCommand
 {
@@ -38,5 +39,15 @@ class ProjectCommand extends DispatcherCommand
     protected function getCommandNamespace()
     {
         return $this->namespace;
+    }
+
+    /**
+     * Create a new command from the given class
+     *
+     * @return Symfony\Component\Console\Command\Command
+     */
+    protected function makeCommand($class)
+    {
+        return new PluginCommand(new $class());
     }
 }

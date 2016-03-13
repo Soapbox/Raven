@@ -143,6 +143,16 @@ abstract class DispatcherCommand extends Command
     }
 
     /**
+     * Create a new command from the given class
+     *
+     * @return Symfony\Component\Console\Command\Command
+     */
+    protected function makeCommand($class)
+    {
+        return new $class();
+    }
+
+    /**
      * This function is used to register commands with this dispatcher
      */
     private function registerCommands()
@@ -157,7 +167,7 @@ abstract class DispatcherCommand extends Command
 
         foreach ($files as $file) {
             $class = sprintf('%s\%s', $namespace, trim($file, '.php'));
-            $this->addCommand(new $class);
+            $this->addCommand($this->makeCommand($class));
         }
 
         $this->commandsRegistered = true;
