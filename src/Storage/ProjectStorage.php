@@ -18,7 +18,9 @@ class ProjectStorage extends ReadableStorage
                 $root = GitHelper::getRepositoryRoot();
 
                 $file = $root  . '/raven.json';
-            } catch (RuntimeException $e) {}
+            } catch (RuntimeException $e) {
+
+            }
         }
 
         $this->loadFile($file);
