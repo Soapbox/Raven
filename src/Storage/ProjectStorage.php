@@ -40,6 +40,11 @@ class ProjectStorage extends ReadableStorage
         return $this->projectRoot;
     }
 
+    public function getCommandDir()
+    {
+        return sprintf('%s/%s', $this->getProjectRoot(), $this->get('commands.path'));
+    }
+
     /**
      * Determine whether or not there are any project commands
      *
@@ -48,6 +53,6 @@ class ProjectStorage extends ReadableStorage
     public function hasCommands()
     {
         return $this->has('commands') &&
-            !empty(array_diff(scandir($this->get('commands.path')), ['.', '..']));
+            !empty(array_diff(scandir($this->getCommandDir()), ['.', '..']));
     }
 }

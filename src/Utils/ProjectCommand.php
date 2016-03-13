@@ -15,7 +15,7 @@ class ProjectCommand extends DispatcherCommand
 
         $this->command = $projectStorage->get('commands.name');
         $this->description = $projectStorage->get('commands.description');
-        $this->path = $projectStorage->get('commands.path');
+        $this->path = $projectStorage->getCommandDir();
         $this->namespace = $projectStorage->get('commands.namespace');
 
         parent::__construct();
