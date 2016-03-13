@@ -1,20 +1,21 @@
 <?php namespace SoapBox\Raven;
 
 use Exception;
-use Composer\Autoload\ClassLoader;
-use KevinGH\Version\Version;
 use SoapBox\Raven\Commands;
-use SoapBox\Raven\Storage\RavenStorage;
-use SoapBox\Raven\Storage\ProjectStorage;
+use KevinGH\Version\Version;
+use Composer\Autoload\ClassLoader;
 use SoapBox\Raven\Utils\ArgvInput;
-use SoapBox\Raven\Utils\DispatcherCommand;
 use SoapBox\Raven\Utils\SelfUpdater;
+use SoapBox\Raven\Storage\RavenStorage;
+use SoapBox\Raven\Utils\ProjectCommand;
+use SoapBox\Raven\Storage\ProjectStorage;
+use SoapBox\Raven\Utils\DispatcherCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 class Raven extends Application
 {
@@ -36,6 +37,15 @@ class Raven extends Application
                     sprintf('%s/%s', $projectStorage->getProjectRoot(), $path)
                 );
             }
+        }
+
+        if ($projectStorage->hasCommands()) {
+            $this->add(new ProjectCommand(
+                $projectStorage->get('commands.name'),
+                $projectStorage->get('commands.description'),
+                $projectStorage->get('commands.path'),
+                $projectStorage->get('commands.namespace')
+            ));
         }
     }
 

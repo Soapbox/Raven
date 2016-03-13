@@ -39,4 +39,9 @@ class ProjectStorage extends ReadableStorage
     {
         return $this->projectRoot;
     }
+
+    public function hasCommands()
+    {
+        return $this->has('commands');
+    }
 }

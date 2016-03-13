@@ -15,7 +15,7 @@ class SelfUpdateCommand extends Command
     const MANIFEST = 'https://soapbox.github.io/raven/manifest.json';
 
     protected $command = 'self-update';
-    protected $description = 'TUpdates raven to the latest version';
+    protected $description = 'Updates raven to the latest version';
 
     protected function addArguments()
     {

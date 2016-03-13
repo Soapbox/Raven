@@ -121,6 +121,28 @@ abstract class DispatcherCommand extends Command
     }
 
     /**
+     * Get the directory that contains all of the commands for this dispatcher
+     *
+     * @return string
+     */
+    protected function getCommandDirectory()
+    {
+        $classInfo = new ReflectionClass($this);
+        return dirname($classInfo->getFileName()) . '/' . ucfirst($this->getName());
+    }
+
+    /**
+     * Get the namespace for the commands
+     *
+     * @return string
+     */
+    protected function getCommandNamespace()
+    {
+        $classInfo = new ReflectionClass($this);
+        return sprintf('%s\%s', $classInfo->getNamespaceName(), ucfirst($this->getName()));
+    }
+
+    /**
      * This function is used to register commands with this dispatcher
      */
     private function registerCommands()
@@ -129,13 +151,12 @@ abstract class DispatcherCommand extends Command
             return;
         }
 
-        $classInfo = new ReflectionClass($this);
-        $dir = dirname($classInfo->getFileName()) . '/' . ucfirst($this->getName());
-        $namespace = $classInfo->getNamespaceName();
+        $dir = $this->getCommandDirectory();
+        $namespace = $this->getCommandNamespace();
         $files = scandir($dir);
 
         foreach ($files as $file) {
-            $class = sprintf('%s\%s\%s', $namespace, ucfirst($this->getName()), rtrim($file, '.php'));
+            $class = sprintf('%s\%s', $namespace, trim($file, '.php'));
             $this->addCommand(new $class);
         }
 
