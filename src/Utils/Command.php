@@ -50,6 +50,7 @@ class Command extends SymfonyCommand
     {
 
     }
+
     protected function addOptions()
     {
 

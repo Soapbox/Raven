@@ -48,6 +48,6 @@ class ProjectCommand extends DispatcherCommand
      */
     protected function makeCommand($class)
     {
-        return new PluginCommand(new $class());
+        return new PluginCommand(new $class(ProjectStorage::getStorage()));
     }
 }

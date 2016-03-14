@@ -2,8 +2,9 @@
 
 use RuntimeException;
 use SoapBox\Raven\Helpers\GitHelper;
+use Raven\Api\Command\ProjectStorage as ProjectStorageApi;
 
-class ProjectStorage extends ReadableStorage
+class ProjectStorage extends ReadableStorage implements ProjectStorageApi
 {
     protected static $instance;
 
