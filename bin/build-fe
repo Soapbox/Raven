@@ -3,3 +3,10 @@
 # Builds the front-end for distribution
 
 bower update --force && npm update --force && grunt dist --uglify
+
+(
+    cd frontend/prelaunch-journey &&
+    npm install &&
+    bower install &&
+    ember build -prod --output-path=../../public/prelaunch-journey-dist
+)
