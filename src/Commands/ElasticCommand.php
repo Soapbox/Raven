@@ -44,7 +44,7 @@ class ElasticCommand extends RunCommand
             ->boolean();
     }
 
-    private function run($command)
+    private function runMyCommand($command)
     {
         $this->runCommand($command, 0);
     }
@@ -53,26 +53,26 @@ class ElasticCommand extends RunCommand
     {
         if ($input->getOption('up')) {
             $output->writeln('<info>Booting up elasticsearch...</info>');
-            $this->run('~/elasticsearch-*/bin/elasticsearch');
+            $this->runMyCommand('~/elasticsearch-*/bin/elasticsearch');
         }
 
         if ($input->getOption('migrate')) {
             $output->writeln('<info>Indexing documents into elasticsearch...</info>');
-            $this->run('php artisan elasticsearch:daily --reindex=true');
+            $this->runMyCommand('php artisan elasticsearch:daily --reindex=true');
         }
 
         if ($input->getOption('refresh')) {
             $output->writeln('<info>Deleting elasticsearch indexes...</info>');
-            $this->run('curl -XDELETE localhost:9200/*');
+            $this->runMyCommand('curl -XDELETE localhost:9200/*');
             $output->writeln('<info>Reindexing elasticsearch indexes...</info>');
-            $this->run('php artisan elasticsearch:daily --reindex=true');
-            $this->run('php artisan elasticsearch:audits --mapping=true');
-            $this->run('php artisan elasticsearch:audits --reindex=true');
+            $this->runMyCommand('php artisan elasticsearch:daily --reindex=true');
+            $this->runMyCommand('php artisan elasticsearch:audits --mapping=true');
+            $this->runMyCommand('php artisan elasticsearch:audits --reindex=true');
         }
 
         if ($input->getOption('halt')) {
             $output->writeln('<info>Halting elasticsearch server...</info>');
-            $this->run("ps axf | grep elasticsearch | grep -v grep | awk '{print \"kill -9 \" $1} | sh");
+            $this->runMyCommand("ps axf | grep elasticsearch | grep -v grep | awk '{print \"kill -9 \" $1} | sh");
         }
 
         $output->writeln('<info>Done!</info>');
