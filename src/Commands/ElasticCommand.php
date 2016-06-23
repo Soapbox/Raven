@@ -13,7 +13,7 @@ class ElasticCommand extends RunCommand
 
     public function isEnabled()
     {
-        return false;
+        return true;
     }
 
     protected function addArguments()
