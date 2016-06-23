@@ -49,6 +49,8 @@ class ElasticCommand extends RunCommand
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $cdToHome =  'cd Development/soapbox/soapbox-v4/ && ';
+
         if ($input->getOption('up')) {
             $output->writeln('<info>Booting up elasticsearch...</info>');
             $this->runMyCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
@@ -56,16 +58,20 @@ class ElasticCommand extends RunCommand
 
         if ($input->getOption('migrate')) {
             $output->writeln('<info>Indexing documents into elasticsearch...</info>');
-            $this->runMyCommand('php artisan elasticsearch:daily --reindex=true');
+            $this->runMyCommand($cdToHome.'php artisan elasticsearch:daily --reindex=true');
         }
 
         if ($input->getOption('refresh')) {
             $output->writeln('<info>Deleting elasticsearch indexes...</info>');
             $this->runMyCommand('curl -XDELETE localhost:9200/*');
             $output->writeln('<info>Reindexing elasticsearch indexes...</info>');
-            $this->runMyCommand('php artisan elasticsearch:daily --reindex=true');
-            $this->runMyCommand('php artisan elasticsearch:audits --mapping=true');
-            $this->runMyCommand('php artisan elasticsearch:audits --reindex=true');
+            $this->runMyCommand($cdToHome.'
+                php artisan index:audits --add=true &&
+                php artisan elasticsearch:daily --reindex=true &&
+                php artisan elasticsearch:audits --mapping=true &&
+                php artisan elasticsearch:audits --reindex=true &&
+                php artisan index:audits --drop=true
+            ');
         }
 
         if ($input->getOption('halt')) {
