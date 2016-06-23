@@ -42,14 +42,16 @@ class ElasticCommand extends RunCommand
 
     private function runMyCommand($command)
     {
-        $this->runCommand($command, 0);
+        $return = 0;
+        $this->runCommand($command, $return);
+        return $return;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('up')) {
             $output->writeln('<info>Booting up elasticsearch...</info>');
-            $this->runMyCommand('~/elasticsearch-*/bin/elasticsearch');
+            $this->runMyCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
         }
 
         if ($input->getOption('migrate')) {
@@ -68,7 +70,7 @@ class ElasticCommand extends RunCommand
 
         if ($input->getOption('halt')) {
             $output->writeln('<info>Halting elasticsearch server...</info>');
-            $this->runMyCommand("ps axf | grep elasticsearch | grep -v grep | awk '{print \"kill -9 \" $1} | sh");
+            $this->runMyCommand('ps axf | grep elasticsearch | grep -v grep | awk \'{print \" kill -9 \" $1}\' | sh');
         }
 
         $output->writeln('<info>Done!</info>');
