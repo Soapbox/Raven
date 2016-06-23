@@ -24,22 +24,18 @@ class ElasticCommand extends RunCommand
     protected function addOptions()
     {
         $this->makeOption('up')
-            ->addShortcut('u')
             ->setDescription('Boot the elasticsearch server.')
             ->boolean();
 
         $this->makeOption('migrate')
-            ->addShortcut('m')
             ->setDescription('Reindex daily documents.')
             ->boolean();
 
         $this->makeOption('refresh')
-            ->addShortcut('r')
             ->setDescription('Delete index and reindex all documents.')
             ->boolean();
 
         $this->makeOption('halt')
-            ->addShortcut('h')
             ->setDescription('Halt the elasticsearch server.')
             ->boolean();
     }
