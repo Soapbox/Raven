@@ -76,7 +76,7 @@ class ElasticCommand extends RunCommand
 
         if ($input->getOption('halt')) {
             $output->writeln('<info>Halting elasticsearch server...</info>');
-            $this->runMyCommand("ps axf | grep elasticsearch | grep -v grep | awk '{print \"kill -9 \" $1}' | sh");
+            $this->runMyCommand('pgrep -f elasticsearch | xargs kill -9');
         }
 
         $output->writeln('<info>Done!</info>');
