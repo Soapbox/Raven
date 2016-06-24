@@ -51,3 +51,6 @@ npm install -g grunt-cli
 
 echo "Installing bower ..."
 npm install -g bower
+
+echo "Installing ember-cli ..."
+npm install -g ember-cli
