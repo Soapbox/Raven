@@ -58,7 +58,7 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
     protected function addArguments()
     {
         $this->makeArgument('argument')
-            ->setDescription('[install|up|migrate|refersh|halt]')
+            ->setDescription('[install|up|migrate|refersh|halt|uninstall]')
             ->required();
 
         $this->makeArgument('install')
@@ -80,6 +80,10 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
         $this->makeArgument('halt')
             ->setDescription('Halt the elasticsearch server.')
             ->optional();
+
+        $this->makeArgument('uninstall')
+            ->setDescription('Uninstall elasticsearch in vagrant.')
+            ->optional();
     }
 
     protected function addOptions() {}
@@ -94,7 +98,6 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->asciiGreeting);
-
 
         date_default_timezone_set('UTC');
         $cdToHome    = 'cd Development/soapbox/soapbox-v4/ && ';
@@ -150,6 +153,13 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
             } else {
                     $output->writeln('<info>Please boot up elasticsearch first. `raven elasticsearch up`</info>');
             }
+
+            if ($arg === 'uninstall') {
+                $output->writeln('<info>Uninstalling elasticsearch...</info>');
+                $this->runMyCommand('rm -rf /home/vagrant/elasticsearch-2.2.0');
+                $output->writeln('<info>Done!</info>');
+            }
+
         } else {
             if ($arg === 'install') {
                 $output->writeln('<info>Installing elasticsearch...</info>');
