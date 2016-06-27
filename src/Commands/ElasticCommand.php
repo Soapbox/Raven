@@ -95,50 +95,60 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
     {
         $output->writeln($this->asciiGreeting);
 
+
         date_default_timezone_set('UTC');
         $cdToHome    = 'cd Development/soapbox/soapbox-v4/ && ';
         $logDirPath  = '/home/deploy/client/elasticsearch/'.date('Y-m-d');
         $isInstalled = !$this->runMyCommand('cd elasticsearch*');
+        $isRunning   = !$this->runMyCommand('pgrep -f elasticsearch');
         $arg         = $input->getArgument('argument');
-
 
         if ($isInstalled) {
             if ($arg === 'install') {
                 $output->writeln('<info>Elastic search is already installed!</info>');
+                return;
             }
 
             if ($arg === 'up') {
-                $output->writeln('<info>Booting up elasticsearch...</info>');
-                $this->runMyCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
-                $output->writeln('<info>Creating log directories in '.$logDirPath.' ...</info>');
-                $this->runMyCommand('sudo mkdir -m u=rwx -p '.$logDirPath);
-                $output->writeln('<info>Done!</info>');
+                if (!$isRunning) {
+                    $output->writeln('<info>Booting up elasticsearch...</info>');
+                    $this->runMyCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
+                    $output->writeln('<info>Creating log directories in '.$logDirPath.' ...</info>');
+                    $this->runMyCommand('sudo mkdir -m u=rwx -p '.$logDirPath);
+                    $output->writeln('<info>Done!</info>');
+                } else {
+                    $output->writeln('<info>Elasticsearch is already running! You can now migrate, refresh, or halt.</info>');
+                }
             }
 
-            if ($arg === 'migrate') {
-                $output->writeln('<info>Indexing documents into elasticsearch...</info>');
-                $this->runMyCommand($cdToHome.'php artisan elasticsearch:daily --reindex=true');
-                $output->writeln('<info>Done!</info>');
-            }
+            if ($isRunning) {
+                if ($arg === 'migrate') {
+                    $output->writeln('<info>Indexing documents into elasticsearch...</info>');
+                    $this->runMyCommand($cdToHome.'php artisan elasticsearch:daily --reindex=true');
+                    $output->writeln('<info>Done!</info>');
+                }
 
-            if ($arg === 'refresh') {
-                $output->writeln('<info>Deleting elasticsearch indexes...</info>');
-                $this->runMyCommand('curl -XDELETE localhost:9200/*');
-                $output->writeln('<info>Reindexing elasticsearch indexes...</info>');
-                $this->runMyCommand($cdToHome.'
-                    php artisan index:audits --add=true &&
-                    php artisan elasticsearch:daily --reindex=true &&
-                    php artisan elasticsearch:audits --mapping=true &&
-                    php artisan elasticsearch:audits --reindex=true &&
-                    php artisan index:audits --drop=true
-                ');
-                $output->writeln('<info>Done!</info>');
-            }
+                if ($arg === 'refresh') {
+                    $output->writeln('<info>Deleting elasticsearch indexes...</info>');
+                    $this->runMyCommand('curl -XDELETE localhost:9200/*');
+                    $output->writeln('<info>Reindexing elasticsearch indexes...</info>');
+                    $this->runMyCommand($cdToHome.'
+                        php artisan index:audits --add=true &&
+                        php artisan elasticsearch:daily --reindex=true &&
+                        php artisan elasticsearch:audits --mapping=true &&
+                        php artisan elasticsearch:audits --reindex=true &&
+                        php artisan index:audits --drop=true
+                    ');
+                    $output->writeln('<info>Done!</info>');
+                }
 
-            if ($arg === 'halt') {
-                $output->writeln('<info>Halting elasticsearch server...</info>');
-                $this->runMyCommand('pgrep -f elasticsearch | xargs kill -9');
-                $output->writeln('<info>Done!</info>');
+                if ($arg === 'halt') {
+                    $output->writeln('<info>Halting elasticsearch server...</info>');
+                    $this->runMyCommand('pgrep -f elasticsearch | xargs kill -9');
+                    $output->writeln('<info>Done!</info>');
+                }
+            } else {
+                    $output->writeln('<info>Please boot up elasticsearch first. `raven elasticsearch up`</info>');
             }
         } else {
             if ($arg === 'install') {
@@ -146,7 +156,7 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
                 $this->runMyCommand('/vagrant/post-installation/elastic-search');
                 $output->writeln('<info>Done!</info>');
             } else {
-                $output->writeln('<info>Please install elasticsearch first. `raven elasticsearch --install`</info>');
+                $output->writeln('<info>Please install elasticsearch first. `raven elasticsearch install`</info>');
             }
         }
 
