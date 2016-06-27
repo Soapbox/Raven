@@ -16,30 +16,34 @@ class ElasticCommand extends RunCommand
         return true;
     }
 
-    protected function addArguments() {}
-
-    protected function addOptions()
+    protected function addArguments()
     {
-        $this->makeOption('install')
+        $this->makeArgument('argument')
+            ->setDescription('[install|up|migrate|refersh|halt]')
+            ->required();
+
+        $this->makeArgument('install')
             ->setDescription('Install elasticsearch in vagrant.')
-            ->boolean();
+            ->optional();
 
-        $this->makeOption('up')
+        $this->makeArgument('up')
             ->setDescription('Boot the elasticsearch server.')
-            ->boolean();
+            ->optional();
 
-        $this->makeOption('migrate')
+        $this->makeArgument('migrate')
             ->setDescription('Reindex daily documents.')
-            ->boolean();
+            ->optional();
 
-        $this->makeOption('refresh')
+        $this->makeArgument('refresh')
             ->setDescription('Delete index and reindex all documents.')
-            ->boolean();
+            ->optional();
 
-        $this->makeOption('halt')
+        $this->makeArgument('halt')
             ->setDescription('Halt the elasticsearch server.')
-            ->boolean();
+            ->optional();
     }
+
+    protected function addOptions() {}
 
     private function runMyCommand($command)
     {
@@ -52,25 +56,26 @@ class ElasticCommand extends RunCommand
     {
         $cdToHome =  'cd Development/soapbox/soapbox-v4/ && ';
         $isInstalled = !$this->runMyCommand('cd elasticsearch*');
+        $arg = $input->getArgument('argument');
 
         if ($isInstalled) {
-            if ($input->getOption('install')) {
+            if ($arg === 'install') {
                 $output->writeln('<info>Elastic search is already installed!</info>');
             }
 
-            if ($input->getOption('up')) {
+            if ($arg === 'up') {
                 $output->writeln('<info>Booting up elasticsearch...</info>');
                 $this->runMyCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
                 $output->writeln('<info>Done!</info>');
             }
 
-            if ($input->getOption('migrate')) {
+            if ($arg === 'migrate') {
                 $output->writeln('<info>Indexing documents into elasticsearch...</info>');
                 $this->runMyCommand($cdToHome.'php artisan elasticsearch:daily --reindex=true');
                 $output->writeln('<info>Done!</info>');
             }
 
-            if ($input->getOption('refresh')) {
+            if ($arg === 'refresh') {
                 $output->writeln('<info>Deleting elasticsearch indexes...</info>');
                 $this->runMyCommand('curl -XDELETE localhost:9200/*');
                 $output->writeln('<info>Reindexing elasticsearch indexes...</info>');
@@ -84,13 +89,13 @@ class ElasticCommand extends RunCommand
                 $output->writeln('<info>Done!</info>');
             }
 
-            if ($input->getOption('halt')) {
+            if ($arg === 'halt') {
                 $output->writeln('<info>Halting elasticsearch server...</info>');
                 $this->runMyCommand('pgrep -f elasticsearch | xargs kill -9');
                 $output->writeln('<info>Done!</info>');
             }
         } else {
-            if ($input->getOption('install')) {
+            if ($arg === 'install') {
                 $output->writeln('<info>Installing elasticsearch...</info>');
                 $output->writeln('<info>Done!</info>');
             } else {
