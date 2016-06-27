@@ -137,6 +137,7 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
         } else {
             if ($arg === 'install') {
                 $output->writeln('<info>Installing elasticsearch...</info>');
+                $this->runMyCommand('/vagrant/post-installation/elastic-search');
                 $output->writeln('<info>Done!</info>');
             } else {
                 $output->writeln('<info>Please install elasticsearch first. `raven elasticsearch --install`</info>');
