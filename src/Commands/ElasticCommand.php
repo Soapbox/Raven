@@ -7,9 +7,45 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ElasticCommand extends RunCommand
 {
+    private $vagrant;
+
+    protected $asciiGreeting = "
+           _           _   _                              _     
+          | |         | | (_)                            | |    
+       ___| | __ _ ___| |_ _  ___ ___  ___  __ _ _ __ ___| |__  
+      / _ \ |/ _` / __| __| |/ __/ __|/ _ \/ _` | '__/ __| '_ \ 
+     |  __/ | (_| \__ \ |_| | (__\__ \  __/ (_| | | | (__| | | |
+      \___|_|\__,_|___/\__|_|\___|___/\___|\__,_|_|  \___|_| |_|
+                                                                
+
+
+     /)/)/) /).-')
+    ////((.'_.--'   .(\(\(\                   n/(/.')_         .
+   ((((_/ .'      .-`)))))))                  `-._ ('.'        \`(\
+  (_._ ` (         `.   (/ |                      \ (           `-.\
+      `-. \          `-.  /                        `.`.           \ \
+         `.`.          | /                /)         \ \           | L
+           `.`._.      ||_               (()          `.\          ) F
+   (`._      `. <    .'.-'                \`-._____    ||        .' /
+    `(\`._.._(\(\)_.'.'-------------.___   `-.(`._ `-./ /     _.' .'
+      (.-.| \_`.__.-<     `.    . .-'   `-.   _> `-._((`.__.-'_.-'
+          (.--'   ' |    \ \     /| \.-./ |\ `-.   _.'>.___,-'`.
+             (  o  <      |     |  `o   o'  |  /(`'.-'   --.    \
+           .'     /      .'   _ |   |   |   |  ( .'/  o .-'   \  |
+           (__.-.`-._  -'    '   \  \   /  /    ' /    _/      | J
+                 \_  `.      _.__.L |   | J      (  .'\`.    _/-./
+                   `-<  .-L|'`-|  ||\\V/ ||       `'   L \  /   /
+                      |J  ||    \ ||||  |||            |  |_|  )
+                      ||  ||     )||||  |||            || / ||J
+                      (|  (|    / |||)  (||            |||  |||
+                      ||  ||   / /||||  |||            |(|  |||
+                      ||  ||  / / ||||  |||            |||  |||
+_______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
+                    '-' '-'       '-'    `-`           '-'   `-`
+    ";
+
     protected $command = 'elasticsearch';
     protected $description = 'Boot and index elasticsearch.';
-    private $vagrant;
 
     public function isEnabled()
     {
@@ -54,6 +90,7 @@ class ElasticCommand extends RunCommand
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln($this->asciiGreeting);
         $cdToHome =  'cd Development/soapbox/soapbox-v4/ && ';
         $isInstalled = !$this->runMyCommand('cd elasticsearch*');
         $arg = $input->getArgument('argument');
