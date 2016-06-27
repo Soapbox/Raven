@@ -31,7 +31,7 @@ composer install
 ```
 
 ### Configuration
-1. Run `soapbox edit`
+1. Run `raven edit`
 2. Configure your folders
 3. Configure your sites
 4. Configure your databases
