@@ -5,6 +5,9 @@ use SoapBox\Raven\Utils\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Install, serve, migrate, refresh, halt an elasticsearch server.
+ */
 class ElasticCommand extends RunCommand
 {
     private $vagrant;
