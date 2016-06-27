@@ -94,9 +94,13 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->asciiGreeting);
-        $cdToHome =  'cd Development/soapbox/soapbox-v4/ && ';
+
+        date_default_timezone_set('UTC');
+        $cdToHome    = 'cd Development/soapbox/soapbox-v4/ && ';
+        $logDirPath  = '/home/deploy/client/elasticsearch/'.date('Y-m-d');
         $isInstalled = !$this->runMyCommand('cd elasticsearch*');
-        $arg = $input->getArgument('argument');
+        $arg         = $input->getArgument('argument');
+
 
         if ($isInstalled) {
             if ($arg === 'install') {
@@ -106,6 +110,8 @@ _______.------.______/ |_/ |_/_|_/// |__| \\__________// |--( \\---------
             if ($arg === 'up') {
                 $output->writeln('<info>Booting up elasticsearch...</info>');
                 $this->runMyCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
+                $output->writeln('<info>Creating log directories in '.$logDirPath.' ...</info>');
+                $this->runMyCommand('sudo mkdir -m u=rwx -p '.$logDirPath);
                 $output->writeln('<info>Done!</info>');
             }
 
