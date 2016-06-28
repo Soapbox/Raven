@@ -17,10 +17,13 @@ class UpCommand extends RunCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         date_default_timezone_set('UTC');
-        $isRunning = !$this->runMyCommand('pgrep -f elasticsearch');
         $isInstalled = !$this->runMyCommand('cd elasticsearch*');
-        $cdToHome    = 'cd Development/soapbox/soapbox-v4/ && ';
+        $isRunning   = !$this->runMyCommand('pgrep -f elasticsearch');
         $logDirPath  = '/home/deploy/client/elasticsearch/'.date('Y-m-d');
+
+        if (!$isInstalled) {
+            $output->writeln('<info>Elasticsearch is not installed! `raven elastic install`</info>');
+        }
 
         if (!$isRunning) {
             $output->writeln('<info>Booting up elasticsearch...</info>');
