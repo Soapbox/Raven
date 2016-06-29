@@ -29,7 +29,7 @@ abstract class Command extends RunCommand
     protected function ensureElasticSearchIsNotRunning(OutputInterface $output)
     {
         if ($this->isElasticSearchRunning()) {
-            $output->writeln('<info>Elasticsearch is already running! You can now migrate, refresh, or halt.</info>');
+            $output->writeln('<info>Elasticsearch is running! You can stop it with halt, or you can run migrate, refresh, or halt.</info>');
             exit(1);
         }
     }
