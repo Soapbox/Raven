@@ -1,50 +1,35 @@
-<?php namespace SoapBox\Raven\Commands\Elastic;
+<?php
 
-use SoapBox\Raven\Commands\RunCommand; 
+namespace SoapBox\Raven\Commands\Elastic;
+
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RefreshCommand extends RunCommand
+class RefreshCommand extends Command
 {
     protected $command = 'refresh';
     protected $description = 'Delete all indexes and reindex all documents.';
 
-    protected function addArguments() 
-    {
-
-    }
-
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $isInstalled = !$this->runMyCommand('cd elasticsearch*');
-        $isRunning   = !$this->runMyCommand('pgrep -f elasticsearch');
-        $cdToHome    = 'cd Development/soapbox/soapbox-v4/ && ';
+        $this->ensureElasticSearchIsInstalled($output);
+        $this->ensureElasticSearchIsRunning($output);
 
-        if (!$isInstalled) {
-            $output->writeln('<info>Elasticsearch is not installed! `raven elastic install`</info>');
-        }
+        $artisanPath  = '~/Development/soapbox/soapbox-v4';
 
-        if ($isRunning) {
-            $output->writeln('<info>Deleting elasticsearch indexes...</info>');
-            $this->runMyCommand('curl -XDELETE localhost:9200/*');
-            $output->writeln('<info>Reindexing elasticsearch indexes...</info>');
-            $this->runMyCommand($cdToHome.'
-                php artisan index:audits --add=true &&
-                php artisan elasticsearch:daily --reindex=true &&
-                php artisan elasticsearch:audits --mapping=true &&
-                php artisan elasticsearch:audits --reindex=true &&
-                php artisan index:audits --drop=true
-            ');
-            $output->writeln('<info>Done!</info>');
-        } else {
-            $output->writeln('<info>Elasticsearch is not running! `raven elastic up`</info>');
-        }
-    }
+        $command = sprintf('
+            php %s/artisan index:audits --add=true &&
+            php %s/artisan elasticsearch:daily --reindex=true &&
+            php %s/artisan elasticsearch:audits --mapping=true &&
+            php %s/artisan elasticsearch:audits --reindex=true &&
+            php %s/artisan index:audits --drop=true
+        ', $artisanPath, $artisanPath, $artisanPath, $artisanPath, $artisanPath);
 
-    private function runMyCommand($command)
-    {
-        $return = 0;
-        $this->runCommand($command, $return);
-        return $return;
+        $output->writeln('<info>Deleting elasticsearch indexes...</info>');
+        $this->runCommand('curl -XDELETE localhost:9200/*');
+
+        $output->writeln('<info>Reindexing elasticsearch indexes...</info>');
+        $this->runCommand($command);
+        $output->writeln('<info>Done!</info>');
     }
 }

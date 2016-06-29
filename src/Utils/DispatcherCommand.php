@@ -136,7 +136,10 @@ abstract class DispatcherCommand extends Command
 
         foreach ($files as $file) {
             $class = sprintf('%s\%s\%s', $namespace, ucfirst($this->getName()), rtrim($file, '.php'));
-            $this->addCommand(new $class);
+            $reflectionClass = new ReflectionClass($class);
+            if (!$reflectionClass->isAbstract()) {
+                $this->addCommand(new $class);
+            }
         }
 
         $this->commandsRegistered = true;

@@ -1,45 +1,29 @@
-<?php namespace SoapBox\Raven\Commands\Elastic;
+<?php
 
-use SoapBox\Raven\Commands\RunCommand; 
+namespace SoapBox\Raven\Commands\Elastic;
+
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpCommand extends RunCommand
+class UpCommand extends Command
 {
     protected $command = 'up';
     protected $description = 'Boot the elasticsearch server.';
 
-    protected function addArguments() 
-    {
-
-    }
-
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->ensureElasticSearchIsInstalled($output);
+        $this->ensureElasticSearchIsNotRunning($output);
+
         date_default_timezone_set('UTC');
-        $isInstalled = !$this->runMyCommand('cd elasticsearch*');
-        $isRunning   = !$this->runMyCommand('pgrep -f elasticsearch');
-        $logDirPath  = '/home/deploy/client/elasticsearch/'.date('Y-m-d');
+        $logPath = sprintf('/home/deploy/client/elasticsearch/$s', date('Y-m-d'));
 
-        if (!$isInstalled) {
-            $output->writeln('<info>Elasticsearch is not installed! `raven elastic install`</info>');
-        }
+        $output->writeln('<info>Booting up elasticsearch...</info>');
+        $this->runCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
 
-        if (!$isRunning) {
-            $output->writeln('<info>Booting up elasticsearch...</info>');
-            $this->runMyCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
-            $output->writeln('<info>Creating log directories in '.$logDirPath.' ...</info>');
-            $this->runMyCommand('sudo mkdir -m u=rwx -p '.$logDirPath);
-            $output->writeln('<info>Done!</info>');
-        } else {
-            $output->writeln('<info>Elasticsearch is already running! You can now migrate, refresh, or halt.</info>');
-        }
-    }
+        $output->writeln(sprintf('<info>Creating log directories in %s ...</info>', $logPath));
+        $this->runCommand(sprintf('sudo mkdir -m u=rwx -p %s', $logPath));
 
-    private function runMyCommand($command)
-    {
-        $return = 0;
-        $this->runCommand($command, $return);
-        return $return;
+        $output->writeln('<info>Done!</info>');
     }
 }
