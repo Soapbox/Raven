@@ -1,4 +1,6 @@
-<?php namespace SoapBox\Raven\Commands;
+<?php
+
+namespace SoapBox\Raven\Commands;
 
 use SoapBox\Raven\Utils\DispatcherCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -9,23 +11,16 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ElasticCommand extends DispatcherCommand
 {
-    private $vagrant;
-
-    protected $isInstalled;
-    protected $isRunning;
-    protected $cdToHome;
-    protected $logDirPath;
-
-    protected $command     = 'elastic';
-    protected $description = 'Boot and index elasticsearch.';
+    protected $command       = 'elastic';
+    protected $description   = 'Boot and index elasticsearch.';
     protected $asciiGreeting = "
-            _           _   _                              _     
-           | |         | | (_)                            | |    
-        ___| | __ _ ___| |_ _  ___ ___  ___  __ _ _ __ ___| |__  
-       / _ \ |/ _` / __| __| |/ __/ __|/ _ \/ _` | '__/ __| '_ \ 
+            _           _   _                              _
+           | |         | | (_)                            | |
+        ___| | __ _ ___| |_ _  ___ ___  ___  __ _ _ __ ___| |__
+       / _ \ |/ _` / __| __| |/ __/ __|/ _ \/ _` | '__/ __| '_ \
       |  __/ | (_| \__ \ |_| | (__\__ \  __/ (_| | | | (__| | | |
        \___|_|\__,_|___/\__|_|\___|___/\___|\__,_|_|  \___|_| |_|
-                                                                
+
 
 
      /)/)/) /).-')
