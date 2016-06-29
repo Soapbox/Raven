@@ -54,6 +54,10 @@ class Raven extends Application
      */
     private function isOutdated()
     {
+        if ($this->getVersion() === '@version@') {
+            return false;
+        }
+
         $currentVersion = new Version($this->getVersion());
         $latestVersion = new Version($this->storage->get('latest_version'));
         if ($latestVersion->isGreaterThan($currentVersion)) {
