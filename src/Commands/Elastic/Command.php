@@ -3,6 +3,7 @@
 namespace SoapBox\Raven\Commands\Elastic;
 
 use SoapBox\Raven\Commands\RunCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class Command extends RunCommand
@@ -55,5 +56,10 @@ abstract class Command extends RunCommand
             $output->writeln('<info>Elasticsearch is already installed!</info>');
             exit(1);
         }
+    }
+
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        chRootDir();
     }
 }

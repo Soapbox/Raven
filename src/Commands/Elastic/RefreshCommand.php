@@ -12,6 +12,7 @@ class RefreshCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        parent::execute($input, $output);
         $this->ensureElasticSearchIsInstalled($output);
         $this->ensureElasticSearchIsRunning($output);
 

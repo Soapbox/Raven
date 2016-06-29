@@ -12,6 +12,7 @@ class InstallCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        parent::execute($input, $output);
         $this->ensureElasticSearchIsNotInstalled($output);
 
         $output->writeln('<info>Installing elasticsearch...</info>');
