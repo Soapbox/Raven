@@ -17,7 +17,7 @@ class UpCommand extends Command
         $this->ensureElasticSearchIsNotRunning($output);
 
         date_default_timezone_set('UTC');
-        $logPath = sprintf('/home/deploy/client/elasticsearch/$s', date('Y-m-d'));
+        $logPath = sprintf('/home/deploy/client/elasticsearch/%s', date('Y-m-d'));
 
         $output->writeln('<info>Booting up elasticsearch...</info>');
         $this->runCommand('nohup ~/elasticsearch-*/bin/elasticsearch & sleep 1');
