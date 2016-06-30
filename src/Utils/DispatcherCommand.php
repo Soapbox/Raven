@@ -57,9 +57,15 @@ abstract class DispatcherCommand extends Command
         $this->registerCommands();
 
         $this->argv = $_SERVER['argv'];
+
         array_shift($this->argv);
-        if (count($this->argv) > 1) {
-            $this->commandString = $this->argv[1];
+
+        $args = array_values(array_filter($this->argv, function ($arg) {
+            return stripos($arg, '-') !== 0;
+        }));
+
+        if (count($args) > 1) {
+            $this->commandString = $args[1];
         }
     }
 
