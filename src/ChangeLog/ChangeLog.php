@@ -4,13 +4,14 @@ use Raven\Api\ChangeLog\ChangeLog as ChangeLogInterface;
 
 class ChangeLog implements ChangeLogInterface
 {
-    use FormatTrait;
-
     private $title;
     private $sections;
     private $previousVersion;
     private $currentVersion;
     private $closedTickets = [];
+    private $titleFormat = '<info>%s</info>';
+    private $sectionLineFormat = '    <comment>%s</comment>';
+    private $sectionEntryLineFormat = '        %s';
 
     public function __construct($previousVersion, $currentVersion)
     {
@@ -101,23 +102,77 @@ class ChangeLog implements ChangeLogInterface
         $this->closedTickets[] = $ticket;
     }
 
+    /**
+     * Set the format string for this ChangeLog's title line. This format can have
+     * one string replacement character that will be replaced with the title
+     *
+     * @param string $format
+     *        The format string to set
+     *
+     * @return void
+     */
+    public function setTitleFormat($format)
+    {
+        $this->titleFormat = $format;
+    }
+
+    /**
+     * Set the format string for each Section's title line. This format can have
+     * one string replacement character that will be replaced with the title
+     *
+     * @param string $format
+     *        The format string to set
+     *
+     * @return void
+     */
+    public function setSectionLineFormat($format)
+    {
+        $this->sectionLineFormat = $format;
+    }
+
+    /**
+     * Set the format string for each SectionEntry's title line. This format can have
+     * one string replacement character that will be replaced with the title
+     *
+     * @param string $format
+     *        The format string to set
+     *
+     * @return void
+     */
+    public function setSectionEntryLineFormat($format)
+    {
+        $this->sectionEntryLineFormat = $format;
+    }
+
+    private function formatLine($formatString, ...$arguments)
+    {
+        $params = array_merge([$formatString], $arguments);
+        return sprintf("%s\r\n", call_user_func_array('sprintf', $params));
+    }
+
     public function __toString()
     {
-        $result = $this->formatLine(sprintf('<info>%s</info>', $this->getTitle()));
+        $result = $this->formatLine($this->titleFormat, $this->getTitle());
 
         foreach ($this->getSections() as $section) {
             if ($section->getEntries()->isEmpty()) {
                 continue;
             }
 
-            $result .= $this->formatLine($section, true);
+            $result .= $this->formatLine($this->sectionLineFormat, $section->getTitle());
+
+            foreach ($section->getEntries() as $entry) {
+                $result .= $this->formatLine($this->sectionEntryLineFormat, $entry->getTitle());
+            }
+
             $result .= "\n";
         }
 
         if (!empty($this->closedTickets)) {
-            $result .= $this->formatLine('   <comment>Closed Tickets</comment>');
+            $result .= $this->formatLine($this->sectionLineFormat, 'Closed Tickets');
+
             foreach ($this->closedTickets as $ticket) {
-                $result .= $this->formatLine(sprintf('      %s', $ticket));
+                $result .= $this->formatLine($this->sectionEntryLineFormat, $ticket);
             }
         }
 

@@ -49,6 +49,10 @@ class GenerateChangelogCommand extends Command
         $this->makeOption('ignore-pre')
             ->setDescription('Ignore pre-releases')
             ->boolean();
+
+        $this->makeOption('formatter')
+            ->setDescription('Specify the formatter to use')
+            ->required();
     }
 
     private function exec($command)
@@ -70,6 +74,10 @@ class GenerateChangelogCommand extends Command
         $storage = RavenStorage::getStorage();
 
         if (!$accessToken = $storage->get('github_access_token')) {
+            if ($input->getOption('batch')) {
+                throw new RuntimeException('Failed to generate changelog. There is no access token available');
+            }
+
             $email = $this->exec('git config --global user.email')[0];
 
             $question = new Question(sprintf('Enter host password for user \'%s\':', $email));
@@ -104,14 +112,32 @@ class GenerateChangelogCommand extends Command
         $endingTag = $input->getArgument('ending_tag');
 
         if (empty($startingTag)) {
+            if (count($recentTags) < 1) {
+                throw new RuntimeException('Could not find a suitable starting tag.');
+            }
+
             $startingIndex = array_search($recentTags[0], $tags);
+
+            if (!isset($tags[$startingIndex])) {
+                throw new RuntimeException('Could not find a suitable starting tag.');
+            }
+
             $startingTag = $tags[$startingIndex];
         } else if (false === $startingIndex = array_search($startingTag, $tags)) {
             throw new InvalidArgumentException('The starting_tag argument is not a valid tag.');
         }
 
         if (empty($endingTag)) {
+            if (count($recentTags) < 2) {
+                throw new RuntimeException('Could not find a suitable ending tag.');
+            }
+
             $endingIndex = array_search($recentTags[1], $tags);
+
+            if (!isset($tags[$endingIndex])) {
+                throw new RuntimeException('Could not find a suitable ending tag.');
+            }
+
             $endingTag = $tags[$endingIndex];
         } else if (false === $endingIndex = array_search($endingTag, $tags)) {
             throw new InvalidArgumentException('The ending_tag argument is not a valid tag.');
@@ -195,12 +221,11 @@ class GenerateChangelogCommand extends Command
             $output->writeln('<info>Fetching latest tags...</info>');
         }
 
-        $temp = [];
-        $this->exec('git fetch -t', $temp);
+        $this->exec('git fetch --tags --quiet');
         $remoteUrl = $this->exec('git config --get remote.origin.url');
 
         $matches = [];
-        if ( !preg_match('/^git@github\.com\:(?P<owner>.+)\/(?P<repo>.+)\.git$/', $remoteUrl[0], $matches) ) {
+        if (!preg_match('/^git@github\.com\:(?P<owner>.+)\/(?P<repo>.+)\.git$/', $remoteUrl[0], $matches)) {
             throw new RuntimeException('Cannot find a remote git repository.');
         }
         $repoOwner = $matches['owner'];
@@ -246,9 +271,20 @@ class GenerateChangelogCommand extends Command
             $this->addPullRequest($response);
         }
 
-        if ($formatterClass = $storage->get('changelog.formatter')) {
-            $formatter = new $formatterClass();
-            $formatter->format($this->changeLog);
+        if ($formatters = $storage->get('changelog.formatters')) {
+            $selectedFormatter = $input->getOption('formatter');
+
+            if (empty($selectedFormatter)) {
+                $selectedFormatter = $storage->get('changelog.default_formatter');
+            }
+
+            if (empty($formatters[$selectedFormatter])) {
+                $output->writeln(sprintf('No formatter found for "%s"', $selectedFormatter));
+            } else {
+                $formatterClass = $formatters[$selectedFormatter];
+                $formatter = new $formatterClass();
+                $formatter->format($this->changeLog);
+            }
         }
 
         if (!$batchMode) {

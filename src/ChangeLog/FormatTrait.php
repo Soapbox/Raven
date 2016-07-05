@@ -2,15 +2,11 @@
 
 trait FormatTrait
 {
-    private function formatLine($text, $indent = false)
+    private function formatLine($text, $indent = '')
     {
-        if ($indent) {
-            $indent = '   ';
-        }
-
         $result = '';
         foreach (explode("\r\n", $text) as $line) {
-            $result = sprintf("%s%s%s\r\n", $result, $indent, $line);
+            $result = sprintf("%s%s%s\r\n", $indent, $result, $line);
         }
         return $result;
     }

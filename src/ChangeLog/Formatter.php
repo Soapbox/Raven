@@ -14,13 +14,13 @@ class Formatter extends FormatterInterface
                 continue;
             }
 
-            $changeLog->setTitle(sprintf('   <comment>%s</comment>', $section->getTitle()));
+            $changeLog->setTitle(sprintf('<comment>%s</comment>', $section->getTitle()));
             foreach ($section->getEntries() as $entry) {
-                $entry->setTitle(sprintf('      %s #%s', $entry->getTitle(), $entry->getPullRequest()->getNumber()));
+                $entry->setTitle(sprintf('%s #%s', $entry->getTitle(), $entry->getPullRequest()->getNumber()));
 
                 $subText = [];
                 foreach ($entry->getSubText() as $subText) {
-                    $subText[] = sprintf('         %s', $subText);
+                    $subText[] = sprintf('%s', $subText);
                 }
                 $entry->setSubText($subText);
             }
