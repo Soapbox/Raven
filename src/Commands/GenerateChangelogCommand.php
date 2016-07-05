@@ -112,14 +112,32 @@ class GenerateChangelogCommand extends Command
         $endingTag = $input->getArgument('ending_tag');
 
         if (empty($startingTag)) {
+            if (count($recentTags) < 1) {
+                throw new RuntimeException('Could not find a suitable starting tag.');
+            }
+
             $startingIndex = array_search($recentTags[0], $tags);
+
+            if (!isset($tags[$startingIndex])) {
+                throw new RuntimeException('Could not find a suitable starting tag.');
+            }
+
             $startingTag = $tags[$startingIndex];
         } else if (false === $startingIndex = array_search($startingTag, $tags)) {
             throw new InvalidArgumentException('The starting_tag argument is not a valid tag.');
         }
 
         if (empty($endingTag)) {
+            if (count($recentTags) < 2) {
+                throw new RuntimeException('Could not find a suitable ending tag.');
+            }
+
             $endingIndex = array_search($recentTags[1], $tags);
+
+            if (!isset($tags[$endingIndex])) {
+                throw new RuntimeException('Could not find a suitable ending tag.');
+            }
+
             $endingTag = $tags[$endingIndex];
         } else if (false === $endingIndex = array_search($endingTag, $tags)) {
             throw new InvalidArgumentException('The ending_tag argument is not a valid tag.');
