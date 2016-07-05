@@ -74,6 +74,10 @@ class GenerateChangelogCommand extends Command
         $storage = RavenStorage::getStorage();
 
         if (!$accessToken = $storage->get('github_access_token')) {
+            if ($input->getOption('batch')) {
+                throw new RuntimeException('Failed to generate changelog. There is no access token available');
+            }
+
             $email = $this->exec('git config --global user.email')[0];
 
             $question = new Question(sprintf('Enter host password for user \'%s\':', $email));
@@ -199,12 +203,11 @@ class GenerateChangelogCommand extends Command
             $output->writeln('<info>Fetching latest tags...</info>');
         }
 
-        $temp = [];
-        $this->exec('git fetch -t', $temp);
+        $this->exec('git fetch --tags --quiet');
         $remoteUrl = $this->exec('git config --get remote.origin.url');
 
         $matches = [];
-        if ( !preg_match('/^git@github\.com\:(?P<owner>.+)\/(?P<repo>.+)\.git$/', $remoteUrl[0], $matches) ) {
+        if (!preg_match('/^git@github\.com\:(?P<owner>.+)\/(?P<repo>.+)\.git$/', $remoteUrl[0], $matches)) {
             throw new RuntimeException('Cannot find a remote git repository.');
         }
         $repoOwner = $matches['owner'];
