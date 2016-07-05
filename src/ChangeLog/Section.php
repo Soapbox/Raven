@@ -4,8 +4,6 @@ use Raven\Api\ChangeLog\Section as SectionInterface;
 
 class Section implements SectionInterface
 {
-    use FormatTrait;
-
     private $entries;
     private $title;
 
@@ -43,16 +41,5 @@ class Section implements SectionInterface
     public function addEntry(SectionEntry $entry)
     {
         $this->entries->push($entry);
-    }
-
-    public function __toString()
-    {
-        $result = $this->formatLine(sprintf('<comment>%s</comment>', $this->getTitle()));
-
-        foreach ($this->getEntries() as $entry) {
-            $result .= $this->formatLine($entry, true);
-        }
-
-        return trim($result, " \r\n");
     }
 }
