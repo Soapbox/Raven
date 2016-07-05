@@ -49,6 +49,10 @@ class GenerateChangelogCommand extends Command
         $this->makeOption('ignore-pre')
             ->setDescription('Ignore pre-releases')
             ->boolean();
+
+        $this->makeOption('formatter')
+            ->setDescription('Specify the formatter to use')
+            ->required();
     }
 
     private function exec($command)
@@ -246,9 +250,20 @@ class GenerateChangelogCommand extends Command
             $this->addPullRequest($response);
         }
 
-        if ($formatterClass = $storage->get('changelog.formatter')) {
-            $formatter = new $formatterClass();
-            $formatter->format($this->changeLog);
+        if ($formatters = $storage->get('changelog.formatters')) {
+            $selectedFormatter = $input->getOption('formatter');
+
+            if (empty($selectedFormatter)) {
+                $selectedFormatter = $storage->get('changelog.default_formatter');
+            }
+
+            if (empty($formatters[$selectedFormatter])) {
+                $output->writeln(sprintf('No formatter found for "%s"', $selectedFormatter));
+            } else {
+                $formatterClass = $formatters[$selectedFormatter];
+                $formatter = new $formatterClass();
+                $formatter->format($this->changeLog);
+            }
         }
 
         if (!$batchMode) {
