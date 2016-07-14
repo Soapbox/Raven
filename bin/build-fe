@@ -10,3 +10,9 @@ bower update --force && npm update --force && grunt dist --uglify
     bower install &&
     ember build -prod --output-path=../../public/prelaunch-journey-dist
 )
+(
+    cd frontend/flat-file-importer &&
+    npm install &&
+    bower install &&
+    ember build -prod --output-path=../../public/flat-file-importer-dist
+)
