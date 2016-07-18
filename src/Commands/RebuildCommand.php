@@ -47,6 +47,7 @@ class RebuildCommand extends RunCommand
         chdir($currentDir);
 
         $process = new Process("php artisan migrate --seed --ansi");
+        $process->setTimeout(null);
         $process->run(function ($type, $line) use ($output) {
             $output->write($line);
         });
