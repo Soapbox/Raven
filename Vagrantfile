@@ -11,6 +11,8 @@ aliasesPath = confDir + "/aliases"
 require File.expand_path(File.dirname(__FILE__) + '/scripts/soapbox.rb')
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+	config.ssh.insert_key = false
+
 	if File.exists? aliasesPath then
 		config.vm.provision "file", source: aliasesPath, destination: "~/.bash_aliases"
 	end
