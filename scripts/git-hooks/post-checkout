@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [[ $1 != $2 ]]; then
-        composer=$(git diff ${1} ${2} --name-only | grep 'composer.lock')
-        if [[ $composer != '' ]]; then
-                composer install --no-scripts
-        fi
-fi
