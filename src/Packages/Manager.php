@@ -11,15 +11,34 @@ use SoapBox\Raven\Utilities\Collection;
 
 class Manager
 {
+    const PACKAGE_DIRECTORY = '/usr/local/raven/packages';
+
+    /**
+     * The class loader instance
+     *
+     * @var \Composer\Autoload\ClassLoader
+     */
     private $loader;
 
+    /**
+     * Create a new package manager
+     *
+     * @param \Composer\Autoload\ClassLoader $loader
+     *        The class loader instance
+     */
     public function __construct(ClassLoader $loader)
     {
         $this->loader = $loader;
     }
 
-    public function getPackages(SplFileInfo $packageDir): Collection
+    /**
+     * Get a collection of all the installed packages
+     *
+     * @return \SoapBox\Raven\Utilities\Collection
+     */
+    public function getPackages(): Collection
     {
+        $packageDir = new SplFileInfo(self::PACKAGE_DIRECTORY);
         $packages = new Collection();
 
         $files = new CallbackFilterIterator(
