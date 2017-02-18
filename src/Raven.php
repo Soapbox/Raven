@@ -43,7 +43,7 @@ class Raven extends Application
 
         foreach ($packages as $package) {
             foreach ($package->getCommands() as $command) {
-                $this->add(new Command($package->getPrefix(), $command));
+                $this->add(new Command($package->getNamespace(), $command));
             }
         }
     }

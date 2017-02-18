@@ -36,25 +36,15 @@ class Package
         return $this->get('command_namespace');
     }
 
-    public function getPrefix(): string
-    {
-        return $this->fileData->get('prefix');
-    }
 
-    public function getCommands(): Collection
+    private function getCommandsForDirectory(string $namespace, SplFileInfo $directory)
     {
         $commands = new Collection();
 
-        $commandDirectory = new SplFileInfo(sprintf(
-            '%s/%s',
-            $this->packageFile->getPath(),
-            $this->get('command_path')
-        ));
-
-        $this->loader->addPsr4($this->getNamespace(), $commandDirectory->getPathname());
+        $this->loader->addPsr4($namespace, $directory->getPathname());
 
         $commandFiles = new CallbackFilterIterator(
-            new FilesystemIterator($commandDirectory),
+            new FilesystemIterator($directory),
             function ($current) {
                 return $current->getExtension() === 'php';
             }
@@ -63,7 +53,7 @@ class Package
         foreach ($commandFiles as $commandFile) {
             $class = sprintf(
                 '%s\\%s',
-                rtrim($this->getNamespace(), '\\'),
+                rtrim($namespace, '\\'),
                 preg_replace('/.php$/', '', $commandFile->getFilename())
             );
 
@@ -74,6 +64,25 @@ class Package
                     $commands->push($command);
                 }
             }
+        }
+
+        return $commands;
+    }
+
+    public function getCommands(): Collection
+    {
+        $commands = new Collection();
+
+        foreach ($this->fileData->get('commands') as $namespace => $directory) {
+            $commandDirectory = new SplFileInfo(sprintf(
+                '%s/%s',
+                $this->packageFile->getPath(),
+                $directory
+            ));
+
+            $commands->merge(
+                $this->getCommandsForDirectory($namespace, $commandDirectory)
+            );
         }
 
         return $commands;

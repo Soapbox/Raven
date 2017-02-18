@@ -43,4 +43,11 @@ class Collection implements IteratorAggregate
     {
         $this->items[$key] = $value;
     }
+
+    public function merge(Traversable $items)
+    {
+        foreach ($items as $item) {
+            $this->push($item);
+        }
+    }
 }
